@@ -1,0 +1,15 @@
+/*
+ *
+ * Dummy gradle file to be able to edit the wiki contents easily from within my IDE NetBeans.
+ *
+ */
+apply plugin: 'java-base'
+
+sourceSets {
+  main {
+    resources {
+      srcDir '.'
+      exclude '*.gradle'
+    }
+  }
+}
