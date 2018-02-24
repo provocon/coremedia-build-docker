@@ -1,8 +1,8 @@
 # CoreMedia Build Container
 
 This repository contains the necessary parts to create a Docker container with
-the few tools necessary to build [CoreMedia][coremedia] Plattform 170x (CoreMedia 
-CMS 9 and CoreMedia Live Context 3) workspaces.
+the few required tools to build [CoreMedia][coremedia] Plattform 17nm or 18nm 
+as used in CoreMedia CMS-9 and CoreMedia Live Context 3 workspaces.
 
 Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
 
@@ -12,6 +12,15 @@ The preparation of the container is accomplished using the usual
 
 ```
 docker build -t <myname> .
+```
+
+```
+docker build -t provocon/coremedia-build:1801.1 .
+docker build -t provocon/coremedia-build:1801 .
+docker build -t provocon/coremedia-build:latest .
+docker push provocon/coremedia-build:1801.1
+docker push provocon/coremedia-build:1801
+docker push provocon/coremedia-build:latest
 ```
 
 ## Availability

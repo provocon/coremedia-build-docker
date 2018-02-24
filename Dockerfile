@@ -13,14 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM maven:3-jdk-8-alpine
+FROM maven:3-jdk-8-slim
 
 # sencha:
 ENV PATH $PATH:/usr/local/sencha/cmd
 
 RUN \
-  apk update && \
-  apk add fontconfig freetype ttf-dejavu xz && \
+  apt-get update && \
+  apt-get -yq install zip && \
+  apt-get -yq install git && \
+  sed -i -e  's/^assistive_technologies/#assistive_technologies/g' /etc/java-8-openjdk/accessibility.properties && \
+  grep assistive_technologies /etc/java-8-openjdk/accessibility.properties && \
   curl http://cdn.sencha.com/cmd/6.2.2/no-jre/SenchaCmd-6.2.2-linux-amd64.sh.zip > /usr/local/senchacmd.zip && \
   cd /usr/local && \
   unzip /usr/local/senchacmd.zip && \
