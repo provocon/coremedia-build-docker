@@ -1,5 +1,5 @@
 #
-# Copyright 2017 Martin Goellnitz.
+# Copyright 2017-2018 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
 #
 FROM maven:3-jdk-8-alpine
 
-RUN apk update
-
 # sencha:
 ENV PATH $PATH:/usr/local/sencha/cmd
 
 RUN \
+  apk update && \
   apk add fontconfig freetype ttf-dejavu xz && \
   curl http://cdn.sencha.com/cmd/6.2.2/no-jre/SenchaCmd-6.2.2-linux-amd64.sh.zip > /usr/local/senchacmd.zip && \
   cd /usr/local && \
