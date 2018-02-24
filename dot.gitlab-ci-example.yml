@@ -1,0 +1,64 @@
+#
+# Copyright 2017-2018 Martin Goellnitz.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Example starting point for a GitLab build file for CoreMedia DXP workspaces 
+# to build a separate deploymeent script archive and maven artifact archive.
+# 
+# Relies on the following variables to be set:
+#
+# CoreMedia Maven Artifact Repository User and Password:
+#   CM_MAVEN_USER
+#   CM_MAVEN_PASSWORD
+#
+image: provocon/coremedia-build:latest
+
+stages:
+  - build
+
+deployment_scripts:
+  stage: build
+  script: 
+  - ls deployment/chef
+  artifacts:
+    name: chef-repo-${CI_COMMIT_REF_NAME}
+    paths:
+    - deployment/chef
+    - deployment/chef/src/assembly/deploy.sh
+    expire_in: 10 hours
+  
+coremedia_cms:
+  stage: build
+  script: 
+  - mkdir -p ~/.m2
+  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+  - mkdir -p repository
+  - rm -rf repository/com/coremedia/blueprint
+  - echo "Repo size after cache extraction and artifacts transfer "
+  - du -sm repository
+  - find repository -type f| wc -l
+  - mvn clean install -B -DskipTests=true
+  - rm -rf repository/com/coremedia/blueprint
+  - echo -n "Repo size after job "
+  - du -sm repository
+  - find repository -type f| wc -l
+  artifacts:
+    name: maven-repo-${CI_COMMIT_REF_NAME}
+    paths:
+    - deployment/chef/target/maven-repo
+    expire_in: 10 hours
+
+cache:
+  paths:
+  - repository/

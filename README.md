@@ -30,7 +30,8 @@ This container can be used via the canonical name `provocon/coremedia-build`.
 ## Goals
 
 This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI.
+[GitLab][gitlabci] CI. An example starting point is included with this 
+repository.
 
 ## Feedback
 
