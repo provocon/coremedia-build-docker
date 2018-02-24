@@ -6,7 +6,6 @@ CMS 9 and CoreMedia Live Context 3) workspaces.
 
 Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
 
-
 ## Preparation
 
 The preparation of the container is accomplished using the usual
@@ -15,12 +14,14 @@ The preparation of the container is accomplished using the usual
 docker build -t <myname> .
 ```
 
+## Availability
+
+This container can be used via the canonical name `provocon/coremedia-build`.
 
 ## Goals
 
 This container is intended for use in container based CI system like the
 [GitLab][gitlabci] CI.
-
 
 ## Feedback
 
