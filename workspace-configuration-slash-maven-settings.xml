@@ -1,0 +1,33 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          
+  <!-- Maven Settings used for GitLab based builds -->
+    
+  <localRepository>${env.CI_PROJECT_DIR}/repository</localRepository>
+
+  <pluginGroups>
+    <pluginGroup>com.coremedia.maven</pluginGroup>
+    <pluginGroup>org.sonatype.plugins</pluginGroup>
+  </pluginGroups>
+
+  <servers>
+    <!-- references by CM workspaces -->
+    <server>
+      <id>coremedia.external.releases</id>
+      <username>${env.CM_MAVEN_USER}</username>
+      <password>${env.CM_MAVEN_PASSWORD}</password>
+    </server>
+    <server>
+      <id>coremedia.external.prereleases</id>
+      <username>${env.CM_MAVEN_USER}</username>
+      <password>${env.CM_MAVEN_PASSWORD}</password>
+    </server>
+    <server>
+      <id>coremedia.external.livecontext.releases</id>
+      <username>${env.CM_MAVEN_USER}</username>
+      <password>${env.CM_MAVEN_PASSWORD}</password>
+    </server>
+  </servers>
+  
+</settings>

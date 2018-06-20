@@ -18,7 +18,7 @@
 # 
 # Relies on the following variables to be set:
 #
-# CoreMedia Maven Artifact Repository User and Password:
+# CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
 #
@@ -29,17 +29,23 @@ stages:
 
 deployment_scripts:
   stage: build
+  only:
+  - tags
   script: 
-  - ls deployment/chef
+  - cp -rdp deployment/chef chef-repo
+  - rm -rf src
+  - rm -rf target
+  - cp -p deployment/chef/src/assembly/deploy.sh .
   artifacts:
     name: chef-repo-${CI_COMMIT_REF_NAME}
     paths:
-    - deployment/chef
-    - deployment/chef/src/assembly/deploy.sh
-    expire_in: 10 hours
+    - chef-repo
+    - deploy.sh
   
 coremedia_cms:
   stage: build
+  only:
+  - tags
   script: 
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -48,16 +54,40 @@ coremedia_cms:
   - echo "Repo size after cache extraction and artifacts transfer "
   - du -sm repository
   - find repository -type f| wc -l
-  - mvn clean install -B -DskipTests=true
+  - mvn clean install -B -T2 -DskipTests=true
   - rm -rf repository/com/coremedia/blueprint
   - echo -n "Repo size after job "
   - du -sm repository
   - find repository -type f| wc -l
+  - mv deployment/chef/target/maven-repo .
   artifacts:
     name: maven-repo-${CI_COMMIT_REF_NAME}
     paths:
-    - deployment/chef/target/maven-repo
-    expire_in: 10 hours
+    - maven-repo
+
+coremedia_cms_snapshot:
+  stage: build
+  only:
+  - master
+  script:
+  - mkdir -p ~/.m2
+  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+  - mkdir -p repository
+  - rm -rf repository/com/coremedia/blueprint
+  - echo "Repo size after cache extraction and artifacts transfer "
+  - du -sm repository
+  - find repository -type f| wc -l
+  - mvn clean install -B -T2 -DskipTests=true
+  - rm -rf repository/com/coremedia/blueprint
+  - echo -n "Repo size after job "
+  - du -sm repository
+  - find repository -type f| wc -l
+  - mv deployment/chef/target/maven-repo .
+  artifacts:
+    name: maven-repo-${CI_COMMIT_REF_NAME}
+    paths:
+    - maven-repo
+    expire_in: 18 hours
 
 cache:
   paths:
