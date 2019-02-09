@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2018 Martin Goellnitz.
+# Copyright 2017-2019 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,5 +30,6 @@ RUN \
   /usr/local/SenchaCmd-6.2.2.36-linux-amd64.sh -q -dir /usr/local/sencha/cmd && \
   mkdir /usr/local/sencha/repo && \
   chmod 777 /usr/local/sencha/repo && \
-  curl https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 > /usr/local/phantomjs.tar.bz2 && \
+  curl -L https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 > phantomjs.tar.bz2 && \
+  tar xjf phantomjs.tar.bz2 && \
   ln -s /usr/local/phantomjs-*/bin/phantomjs /usr/local/bin/phantomjs
