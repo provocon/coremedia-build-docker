@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2018 Martin Goellnitz.
+# Copyright 2017-2019 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,15 +22,22 @@
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
 #
+# Target directories and host access:
+#   INSTALL  - directory to store deployment data in
+#   SOURCE   - directory to store deployment archive in
+#   AIO_HOST - name of the user and host to deploy to
+#   AIO_KEY  - ssh key file to be used on host access
+#   AIO_PASSWORD  - ssh key archive file password for extraction
+#   NODE - name of the node definition JSON file for chef
+#
 image: provocon/coremedia-build:latest
 
 stages:
   - build
+  - test
 
 deployment_scripts:
   stage: build
-  only:
-  - tags
   script: 
   - cp -rdp deployment/chef chef-repo
   - rm -rf src
@@ -44,8 +51,6 @@ deployment_scripts:
   
 coremedia_cms:
   stage: build
-  only:
-  - tags
   script: 
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -60,34 +65,35 @@ coremedia_cms:
   - du -sm repository
   - find repository -type f| wc -l
   - mv deployment/chef/target/maven-repo .
+  - mv deployment/chef/target/deployment-archive.zip .
   artifacts:
     name: maven-repo-${CI_COMMIT_REF_NAME}
     paths:
-    - maven-repo
+    - deployment-archive.zip
 
-coremedia_cms_snapshot:
-  stage: build
-  only:
-  - master
+deploy_cms:
+  stage: test
   script:
-  - mkdir -p ~/.m2
-  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
-  - mkdir -p repository
-  - rm -rf repository/com/coremedia/blueprint
-  - echo "Repo size after cache extraction and artifacts transfer "
-  - du -sm repository
-  - find repository -type f| wc -l
-  - mvn clean install -B -T2 -DskipTests=true
-  - rm -rf repository/com/coremedia/blueprint
-  - echo -n "Repo size after job "
-  - du -sm repository
-  - find repository -type f| wc -l
-  - mv deployment/chef/target/maven-repo .
-  artifacts:
-    name: maven-repo-${CI_COMMIT_REF_NAME}
-    paths:
-    - maven-repo
-    expire_in: 18 hours
+  - apt-get update && apt-get install -y p7zip-full
+  - 7z x -p$AIO_PASSWORD ${AIO_KEY}.7z
+  - ls -l
+  - export SSH="ssh -i ${AIO_KEY}.openssh -o StrictHostKeyChecking=no $AIO_HOST -C "
+  - $SSH "test -d $INSTALL || mkdir -p $INSTALL"
+  - $SSH "test -d $SOURCE || mkdir -p $SOURCE"
+  - scp -i ${AIO_KEY}.openssh deployment-archive.zip $AIO_HOST:$SOURCE/deployment-archive.zip
+  - $SSH "rm -rf $INSTALL/* ; unzip -q -d $INSTALL $SOURCE/deployment-archive.zip"
+  - $SSH "rm -f $SOURCE/deployment-archive.zip"
+  - $SSH "test -d /tmp/maven-repo || ln -s $INSTALL/maven-repo /tmp/maven-repo"
+  - $SSH "test -f /tmp/content-users.zip || ln -s $INSTALL/content-users.zip /tmp/content-users.zip"
+  - $SSH "if [ -f /etc/init.d/solr ] ; then service solr stop ; fi"
+  - $SSH "rm -f /var/log/coremedia/*/*log*.txt /var/log/coremedia/*/*.log /var/log/coremedia/*/*.log.* /var/log/coremedia/*/*.out"
+  - export CMS_RELEASE=$($SSH "cd $INSTALL/maven-repo ; ls com/coremedia/blueprint/cae-live-webapp|grep -v maven")
+  - $SSH "sed -i -e  s/LATEST/$CMS_RELEASE/g $INSTALL/chef-repo/cookbooks/blueprint/recipes/_development.rb"
+  - $SSH "sed -i -e  s/1-SNAPSHOT/$CMS_RELEASE/g $INSTALL/chef-repo/cookbooks/blueprint-base/attributes/default.rb"
+  - $SSH "chef-solo --config $INSTALL/chef-repo/.chef/solo.rb --environment development --json-attributes $INSTALL/chef-repo/nodes/$NODE.json"
+  - $SSH "rm -f /tmp/maven-repo /tmp/content-users.zip"
+  dependencies:
+  - coremedia_cms
 
 cache:
   paths:
