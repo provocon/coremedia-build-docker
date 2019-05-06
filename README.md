@@ -15,12 +15,18 @@ docker build -t <myname> .
 ```
 
 ```
-docker build -t provocon/coremedia-build:1901.1 .
-docker build -t provocon/coremedia-build:1901 .
+docker build -t provocon/coremedia-build:1904.1 .
+docker build -t provocon/coremedia-build:1904 .
 docker build -t provocon/coremedia-build:latest .
-docker push provocon/coremedia-build:1901.1
-docker push provocon/coremedia-build:1901
+docker push provocon/coremedia-build:1904.1
+docker push provocon/coremedia-build:1904
 docker push provocon/coremedia-build:latest
+```
+
+## Test
+
+```
+docker run -it provocon/coremedia-build bash
 ```
 
 ## Availability
