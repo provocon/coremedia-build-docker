@@ -23,12 +23,12 @@
 #   CM_MAVEN_PASSWORD
 #
 # Target directories and host access:
-#   INSTALL  - directory to store deployment data in
-#   SOURCE   - directory to store deployment archive in
-#   AIO_HOST - name of the user and host to deploy to
-#   AIO_KEY  - ssh key file to be used on host access
-#   AIO_PASSWORD  - ssh key archive file password for extraction
-#   NODE - name of the node definition JSON file for chef
+#   INSTALL      - directory to store deployment data in
+#   SOURCE       - directory to store deployment archive in
+#   AIO_HOST     - name of the user and host to deploy to
+#   AIO_KEY      - ssh key file to be used on host access
+#   AIO_PASSWORD - ssh key archive file password for extraction
+#   NODE         - name of the node definition JSON file for chef
 #
 image: provocon/coremedia-build:latest
 
@@ -36,6 +36,15 @@ stages:
   - build
   - test
 
+# Needed for Extensions
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# The artifacts sections in this file product archives archives but due to 
+# better compression this still results in approximately 35% smaller
+# files to store and transfer on each build.
+
+# Just an example to separate deployment scripts from artifact store - not used subsequently
 deployment_scripts:
   stage: build
   script: 
@@ -43,15 +52,22 @@ deployment_scripts:
   - rm -rf src
   - rm -rf target
   - cp -p deployment/chef/src/assembly/deploy.sh .
+  - tar cvJf deployment-scripts.tar.xz chef-repo deploy.sh
   artifacts:
     name: chef-repo-${CI_COMMIT_REF_NAME}
     paths:
-    - chef-repo
-    - deploy.sh
-  
+    - deployment-scripts.tar.xz
+    expire_in: 3 days
+
+# Generate and store deployment archive - could be modified to just hold the maven repository
 coremedia_cms:
   stage: build
   script: 
+  - mkdir /home/build
+  - mkdir -p /home/build/.m2
+  - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
+  - useradd -d /home/build build
+  - chown -R build /home/build
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
   - mkdir -p repository
@@ -59,30 +75,34 @@ coremedia_cms:
   - echo "Repo size after cache extraction and artifacts transfer "
   - du -sm repository
   - find repository -type f| wc -l
-  - mvn clean install -B -T2 -DskipTests=true
+  - sed -i -e 's/format.zip..format/format>tar<\/format/g' deployment/chef/src/assembly/deployment-archive.xml
+  - chown -R build modules
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
   - rm -rf repository/com/coremedia/blueprint
   - echo -n "Repo size after job "
   - du -sm repository
   - find repository -type f| wc -l
-  - mv deployment/chef/target/maven-repo .
-  - mv deployment/chef/target/deployment-archive.zip .
+  - mv deployment/chef/target/deployment-archive.tar .
+  - xz -9 deployment-archive.tar
+  - ls -l
   artifacts:
-    name: maven-repo-${CI_COMMIT_REF_NAME}
+    name: deployment-archive-${CI_COMMIT_REF_NAME}
     paths:
-    - deployment-archive.zip
+    - deployment-archive.tar.xz
+    expire_in: 3 days
 
+# Simple All-In-One-Deployment from the deployment archive
 deploy_cms:
   stage: test
   script:
-  - apt-get update && apt-get install -y p7zip-full
-  - 7z x -p$AIO_PASSWORD ${AIO_KEY}.7z
   - ls -l
+  - 7z x -p$AIO_PASSWORD ${AIO_KEY}.7z
   - export SSH="ssh -i ${AIO_KEY}.openssh -o StrictHostKeyChecking=no $AIO_HOST -C "
   - $SSH "test -d $INSTALL || mkdir -p $INSTALL"
   - $SSH "test -d $SOURCE || mkdir -p $SOURCE"
-  - scp -i ${AIO_KEY}.openssh deployment-archive.zip $AIO_HOST:$SOURCE/deployment-archive.zip
-  - $SSH "rm -rf $INSTALL/* ; unzip -q -d $INSTALL $SOURCE/deployment-archive.zip"
-  - $SSH "rm -f $SOURCE/deployment-archive.zip"
+  - scp -i ${AIO_KEY}.openssh deployment-archive.tar.xz $AIO_HOST:$SOURCE/deployment-archive.tar.xz
+  - $SSH "rm -rf $INSTALL/* ; cd $INSTALL ; tar xvJf $SOURCE/deployment-archive.tar.xz"
+  - $SSH "rm -f $SOURCE/deployment-archive.tar.xz"
   - $SSH "test -d /tmp/maven-repo || ln -s $INSTALL/maven-repo /tmp/maven-repo"
   - $SSH "test -f /tmp/content-users.zip || ln -s $INSTALL/content-users.zip /tmp/content-users.zip"
   - $SSH "if [ -f /etc/init.d/solr ] ; then service solr stop ; fi"
