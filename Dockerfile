@@ -21,7 +21,7 @@ ENV PATH $PATH:/usr/local/sencha/cmd
 # http://cdn.sencha.com/cmd/6.7.0.37/no-jre/SenchaCmd-6.7.0.37-linux-amd64.sh.zip
 RUN \
   apt-get update && \
-  apt-get -yq install zip p7zip-full && \
+  apt-get -yq install zip p7zip-full parallel && \
   apt-get -yq install git sudo && \
   sed -i -e  's/^assistive_technologies/#assistive_technologies/g' /etc/java-8-openjdk/accessibility.properties && \
   grep assistive_technologies /etc/java-8-openjdk/accessibility.properties && \
