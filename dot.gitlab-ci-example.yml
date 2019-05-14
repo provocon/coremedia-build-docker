@@ -65,25 +65,38 @@ coremedia_cms:
   script: 
   - mkdir /home/build
   - mkdir -p /home/build/.m2
+  - mkdir -p /home/build/.cache
+  - test -d yarn && mv yarn /home/build/.cache
   - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
   - useradd -d /home/build build
   - chown -R build /home/build
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
   - mkdir -p repository
+  - chown -R build repository
+  - mkdir -p .remote-packages
+  - chown -R build .remote-packages
   - rm -rf repository/com/coremedia/blueprint
   - echo "Repo size after cache extraction and artifacts transfer "
-  - du -sm repository
+  - du -sh repository
+  - du -sh .remote-packages
+  - du -sh /home/build/.cache
   - find repository -type f| wc -l
+  - find .remote-packages -type f| wc -l
+  - find /home/build/.cache -type f| wc -l
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' deployment/chef/src/assembly/deployment-archive.xml
   - chown -R build modules
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
   - rm -rf repository/com/coremedia/blueprint
+  - mv /home/build/.cache/yarn .
   - echo -n "Repo size after job "
-  - du -sm repository
+  - du -sh repository
+  - du -sh .remote-packages
+  - du -sh yarn
   - find repository -type f| wc -l
+  - find yarn -type f| wc -l
   - mv deployment/chef/target/deployment-archive.tar .
-  - xz -9 deployment-archive.tar
+  - cat deployment-archive.tar | parallel --block 256m --pipe --recend '' -k xz -9 >deployment-archive.tar.xz
   - ls -l
   artifacts:
     name: deployment-archive-${CI_COMMIT_REF_NAME}
@@ -101,7 +114,7 @@ deploy_cms:
   - $SSH "test -d $INSTALL || mkdir -p $INSTALL"
   - $SSH "test -d $SOURCE || mkdir -p $SOURCE"
   - scp -i ${AIO_KEY}.openssh deployment-archive.tar.xz $AIO_HOST:$SOURCE/deployment-archive.tar.xz
-  - $SSH "rm -rf $INSTALL/* ; cd $INSTALL ; tar xvJf $SOURCE/deployment-archive.tar.xz"
+  - $SSH "rm -rf $INSTALL/* ; cd $INSTALL ; tar xJf $SOURCE/deployment-archive.tar.xz"
   - $SSH "rm -f $SOURCE/deployment-archive.tar.xz"
   - $SSH "test -d /tmp/maven-repo || ln -s $INSTALL/maven-repo /tmp/maven-repo"
   - $SSH "test -f /tmp/content-users.zip || ln -s $INSTALL/content-users.zip /tmp/content-users.zip"
@@ -118,3 +131,5 @@ deploy_cms:
 cache:
   paths:
   - repository/
+  - .remote-packages/
+  - yarn/
