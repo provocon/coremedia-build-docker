@@ -36,13 +36,13 @@ stages:
   - build
   - test
 
-# Needed for Extensions
+# Needed for Extensions in GIT Submodules
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-# The artifacts sections in this file product archives archives but due to 
-# better compression this still results in approximately 35% smaller
-# files to store and transfer on each build.
+# The artifacts sections in this file produce archives in archives, but due to 
+# better compression this still results in approximately 35% smaller files to
+# store and transfer on each build.
 
 # Just an example to separate deployment scripts from artifact store - not used subsequently
 deployment_scripts:
