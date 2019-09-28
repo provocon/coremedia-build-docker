@@ -13,22 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM maven:3-jdk-8-slim
+FROM maven:3.6-amazoncorretto-113
 
 # sencha:
 ENV PATH $PATH:/usr/local/sencha/cmd
 
-# http://cdn.sencha.com/cmd/6.7.0.37/no-jre/SenchaCmd-6.7.0.37-linux-amd64.sh.zip
 RUN \
   apt-get update && \
   apt-get -yq install zip p7zip-full parallel && \
   apt-get -yq install git sudo && \
   sed -i -e  's/^assistive_technologies/#assistive_technologies/g' /etc/java-8-openjdk/accessibility.properties && \
   grep assistive_technologies /etc/java-8-openjdk/accessibility.properties && \
-  curl http://cdn.sencha.com/cmd/6.5.3.6/no-jre/SenchaCmd-6.5.3.6-linux-amd64.sh.zip > /usr/local/senchacmd.zip && \
+  curl http://cdn.sencha.com/cmd/6.7.0.37/no-jre/SenchaCmd-6.7.0.37-linux-amd64.sh.zip > /usr/local/senchacmd.zip && \
   cd /usr/local && \
   unzip /usr/local/senchacmd.zip && \ 
-  /usr/local/SenchaCmd-6.5.3.6-linux-amd64.sh -q -dir /usr/local/sencha/cmd && \
+  /usr/local/SenchaCmd-6.7.0.37-linux-amd64.sh -q -dir /usr/local/sencha/cmd && \
   mkdir /usr/local/sencha/repo && \
   chmod 777 /usr/local/sencha/repo && \
   grep -v export.PATH.*sencha.* ~/.bashrc > ~/.brc && \
