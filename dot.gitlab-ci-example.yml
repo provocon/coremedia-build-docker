@@ -48,10 +48,10 @@ variables:
 deployment_scripts:
   stage: build
   script: 
-  - cp -rdp deployment/chef chef-repo
+  - cp -rdp global/deployment/chef chef-repo
   - rm -rf src
   - rm -rf target
-  - cp -p deployment/chef/src/assembly/deploy.sh .
+  - cp -p global/deployment/chef/src/assembly/deploy.sh .
   - tar cvJf deployment-scripts.tar.xz chef-repo deploy.sh
   artifacts:
     name: chef-repo-${CI_COMMIT_REF_NAME}
@@ -84,9 +84,13 @@ coremedia_cms:
   - find repository -type f| wc -l
   - find .remote-packages -type f| wc -l
   - find /home/build/.cache -type f| wc -l
-  - sed -i -e 's/format.zip..format/format>tar<\/format/g' deployment/chef/src/assembly/deployment-archive.xml
-  - chown -R build modules
+  - sed -i -e 's/format.zip..format/format>tar<\/format/g' global/deployment/chef/src/assembly/deployment-archive.xml
+  - chown -R build apps
+  - chown -R build frontend
   - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - cd global/deployment/chef
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - cd ../../..
   - rm -rf repository/com/coremedia/blueprint
   - mv /home/build/.cache/yarn .
   - echo -n "Repo size after job "
@@ -95,7 +99,7 @@ coremedia_cms:
   - du -sh yarn
   - find repository -type f| wc -l
   - find yarn -type f| wc -l
-  - mv deployment/chef/target/deployment-archive.tar .
+  - mv global/deployment/chef/target/deployment-archive.tar .
   - cat deployment-archive.tar | parallel --block 256m --pipe --recend '' -k xz -9 >deployment-archive.tar.xz
   - ls -l
   artifacts:
