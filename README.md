@@ -2,7 +2,7 @@
 
 This repository contains the necessary parts to create a Docker container with
 the few required tools to build [CoreMedia][coremedia] Plattform 17nm, 18nm, 
-and 19nm as used in CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live 
+or 19nm as used in CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live 
 Context 3 workspaces.
 
 Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
