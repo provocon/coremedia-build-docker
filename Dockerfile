@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM provocon/openjdk11maven3.6
+FROM maven:3.6-jdk-11
 
 # sencha:
 ENV PATH $PATH:/usr/local/sencha
