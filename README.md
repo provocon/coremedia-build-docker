@@ -41,15 +41,11 @@ docker push provocon/coremedia-build:latest
 ```    
 **Alternatively you could use the [Gradle Build Tool](https://gradle.org/) and issue**
 ````shell script
-gradle dockerPush
+gradle -PbuildTag=1907.1  dockerPush
+gradle -PbuildTag=1907    dockerPush
+gradle -PbuildTag=lastest dockerPush
 ````             
-which does all the steps above for you. Just adapt the image name
-```groovy                                                        
-docker {
-  name 'provocon/coremedia-build:1907.1.1'
-}
-```
-in ```build.gradle``` before! 
+which does all the steps above for you.
  
 
 ## Test

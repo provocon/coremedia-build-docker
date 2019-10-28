@@ -16,6 +16,7 @@ sourceSets {
 }
 
 /* Transform string contents into a list. Useful to bring command lines into the internal gradle array format. */
+
 private List<String> getCmd(String cmd) {
   List<String> result = new ArrayList<>(2)
   "$cmd".split(" ").each {
@@ -26,12 +27,17 @@ private List<String> getCmd(String cmd) {
 
 /* The gradle-docker-plugin can not handle multiple Dockerfile's in one directory. So we have to help ourselves here. */
 task buildBaseImage(type: Exec) {
+  if (!project.hasProperty("buildTag"))
+    throw new GradleException('!!! Please specify build version using => \$ gradle -PbuildTag=... !!!')
+  println "************************"
+  println "Using buildTag=$buildTag"
+  println "************************"
   commandLine getCmd("docker build -f Dockerfile.alpine-docker-jdk11-maven3.6 -t provocon/alpine-docker-jdk11-maven3.6:latest .")
 }
 
 /* Build and push the final image to https://hub.docker.com/r/provocon/coremedia-build/tags with "gradle dockerPush" */
 docker {
-  name 'provocon/coremedia-build:1907.1'
+  name "provocon/coremedia-build:$buildTag"
 }
 
 docker.dependsOn buildBaseImage
