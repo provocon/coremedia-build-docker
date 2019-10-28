@@ -101,4 +101,5 @@ for feedback.
 [github]: https://github.com/provocon/coremedia-build-docker
 [gitlab]: https://gitlab.com/provocon/coremedia-build-docker
 [alpine]: https://www.alpinelinux.org/
+[maven]: https://maven.apache.org/
 [gradle]: https://gradle.org/
