@@ -52,7 +52,7 @@ deployment_scripts:
   - rm -rf src
   - rm -rf target
   - cp -p global/deployment/chef/src/assembly/deploy.sh .
-  - tar cvJf deployment-scripts.tar.xz chef-repo deploy.sh
+  - tar cJf deployment-scripts.tar.xz chef-repo deploy.sh
   artifacts:
     name: chef-repo-${CI_COMMIT_REF_NAME}
     paths:
@@ -68,7 +68,7 @@ coremedia_cms:
   - mkdir -p /home/build/.cache
   - test -d yarn && mv yarn /home/build/.cache
   - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
-  - useradd -d /home/build build
+  - adduser -D -h /home/build build
   - chown -R build /home/build
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -87,10 +87,7 @@ coremedia_cms:
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' global/deployment/chef/src/assembly/deployment-archive.xml
   - chown -R build apps
   - chown -R build frontend
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
-  - cd global/deployment/chef
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
-  - cd ../../..
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
   - rm -rf repository/com/coremedia/blueprint
   - mv /home/build/.cache/yarn .
   - echo -n "Repo size after job "
@@ -108,7 +105,35 @@ coremedia_cms:
     - deployment-archive.tar.xz
     expire_in: 3 days
 
-# Simple All-In-One-Deployment from the deployment archive
+# Generate containers
+containers:
+  stage: build
+  script:
+  - test -d yarn && mv yarn ~/.cache
+  - mkdir -p ~/.m2
+  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+  - mkdir -p repository
+  - mkdir -p .remote-packages
+  - rm -rf repository/com/coremedia/blueprint
+  - echo "Repo size after cache extraction and artifacts transfer "
+  - du -sh repository
+  - du -sh .remote-packages
+  - du -sh ~/.cache
+  - find repository -type f| wc -l
+  - find .remote-packages -type f| wc -l
+  - find ~/.cache -type f| wc -l
+  - mvn clean install -Pwith-docker -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - rm -rf repository/com/coremedia/blueprint
+  - mv ~/.cache/yarn .
+  - echo -n "Repo size after job "
+  - du -sh repository
+  - du -sh .remote-packages
+  - du -sh yarn
+  - find repository -type f| wc -l
+  - find yarn -type f| wc -l
+  - ls -l
+
+# Simple All-In-One-Deployment from the chef deployment archive
 deploy_cms:
   stage: test
   script:
