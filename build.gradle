@@ -31,7 +31,7 @@ task buildBaseImage(type: Exec) {
 
 /* Build and push the final image to https://hub.docker.com/r/provocon/coremedia-build/tags with "gradle dockerPush" */
 docker {
-  name 'provocon/coremedia-build:1907.1.1'
+  name 'provocon/coremedia-build:1907.1'
 }
 
 docker.dependsOn buildBaseImage
