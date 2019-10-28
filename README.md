@@ -7,9 +7,7 @@ Context 3 workspaces.
 
 Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
 
-## Preparation
-
- ## Build
+## Build
 
 To be able to support `docker in docker` creation of containers, we had to
 prepare a new base-container with [Alpine Linux][alpine], JDK11, and
@@ -38,19 +36,25 @@ docker build -t provocon/coremedia-build:latest .
 docker push provocon/coremedia-build:1907.1
 docker push provocon/coremedia-build:1907
 docker push provocon/coremedia-build:latest
-```    
-**Alternatively you could use the [Gradle Build Tool](https://gradle.org/) and issue**
-````shell script
-gradle dockerPush
-````             
-which does all the steps above for you. Just adapt the image name
-```groovy                                                        
-docker {
-  name 'provocon/coremedia-build:1907.1.1'
-}
 ```
-in ```build.gradle``` before! 
- 
+
+**Alternatively you could use the [Gradle Build Tool][gradle] and issue**
+
+```
+gradle dockerPush
+```
+
+which does all the steps above for you. Just modify the image name accordingly
+
+```
+docker {
+  name 'provocon/coremedia-build:1907.1'
+}
+
+```
+
+in `build.gradle` before this step.
+
 
 ## Test
 
@@ -108,3 +112,4 @@ for feedback.
 [gitlab]: https://gitlab.com/provocon/coremedia-build-docker
 [alpine]: https://www.alpinelinux.org/
 [maven]: https://maven.apache.org/
+[gradle]: https://gradle.org/
