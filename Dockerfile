@@ -15,7 +15,9 @@
 #
 FROM provocon/alpine-docker-jdk11-maven3.6:latest
 
-# sencha:
+#################################################
+# ----------------SenchaCmd----------------------
+#################################################
 ARG SENCHA_VERSION=6.7.0.63
 ENV PATH $PATH:/usr/local/sencha
 
@@ -31,7 +33,15 @@ RUN \
   mkdir /usr/local/sencha/repo && \
   chmod 777 /usr/local/sencha/repo && \
   ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
-  curl -Lo phantomjs.tar.bz2  https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 && \
-  tar xjf phantomjs.tar.bz2 && \
-  ln -s /usr/local/phantomjs-*/bin/phantomjs /usr/local/bin/phantomjs && \
-  rm -f sencha.zip phantomjs.tar.bz2 SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh
+  rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh
+
+#################################################
+# ----------------Chrome-------------------------
+#################################################
+# Taken from https://stackoverflow.com/a/48295423
+ENV CHROME_BIN=/usr/bin/chromium-browser
+RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
+    apk add --no-cache \
+      chromium chromium-chromedriver \
+      nss@edge

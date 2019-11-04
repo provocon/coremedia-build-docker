@@ -49,14 +49,11 @@ RUN apk add --no-cache --virtual .build-deps curl binutils \
     && tar -xf /tmp/libz.tar.xz -C /tmp/libz \
     && mv /tmp/libz/usr/lib/libz.so* /usr/glibc-compat/lib \
     && apk del --purge .build-deps glibc-i18n \
-    && rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
+    && rm -rf /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/* \
+    && apk add openssh-client
 
 ENV JAVA_VERSION jdk-11.0.4+11
 
-#    curl -Lfo /tmp/openjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.4%2B11/OpenJDK11U-jdk_x64_linux_hotspot_11.0.4_11.tar.gz; \
-#    echo "90c33cf3f2ed0bd773f648815de7347e69cfbb3416ef3bf41616ab1c4aa0f5a8 */tmp/openjdk.tar.gz" | sha256sum -c -; \
-#    curl -Lfo /tmp/openjdk.tar.gz https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz; \
-#    echo "3784cfc4670f0d4c5482604c7c513beb1a92b005f569df9bf100e8bef6610f2e */tmp/openjdk.tar.gz" | sha256sum -c -; \
 RUN set -eux; \
     apk add --no-cache --virtual .fetch-deps curl; \
     curl -Lfo /tmp/openjdk.tar.gz https://d3pxv6yz143wms.cloudfront.net/11.0.3.7.1/amazon-corretto-11.0.3.7.1-linux-x64.tar.gz; \
