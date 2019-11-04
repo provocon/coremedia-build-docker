@@ -41,7 +41,7 @@ docker push provocon/coremedia-build:latest
 ````shell script
 gradle -PbuildTag=1907.1  dockerPush
 gradle -PbuildTag=1907    dockerPush
-gradle -PbuildTag=lastest dockerPush
+gradle -PbuildTag=latest dockerPush
 ````             
 which does all the steps above for you.
  
