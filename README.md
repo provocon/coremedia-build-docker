@@ -44,7 +44,7 @@ docker build -t provocon/coremedia-build:latest .
 docker push provocon/coremedia-build:1907.1
 docker push provocon/coremedia-build:1907
 docker push provocon/coremedia-build:latest
-```
+```    
 
 ### Scripted Build
 
@@ -53,11 +53,11 @@ Alternatively you could use the [Gradle Build Tool][gradle] and issue
 ```
 gradle -PbuildTag=1907.1  dockerPush
 gradle -PbuildTag=1907    dockerPush
-gradle -PbuildTag=lastest dockerPush
+gradle -PbuildTag=latest dockerPush
 ```             
 
 which does all the steps above for you except building the base-container.
-
+ 
 
 ## Test
 
@@ -88,11 +88,6 @@ OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
 $ docker run --name sencha --rm -it --entrypoint=sencha provocon/coremedia-build which
 Sencha Cmd v6.7.0.63
 /usr/local/sencha/6.7.0.63/
-```
-
-```
-$ docker run --name phantomjs --rm -it --entrypoint=phantomjs provocon/coremedia-build -v
-2.1.1
 ```
 
 To call the container image use
