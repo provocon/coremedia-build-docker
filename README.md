@@ -5,7 +5,8 @@ the few required tools to build [CoreMedia][coremedia] Plattform 17nm, 18nm,
 or 19nm as used in CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live 
 Context 3 workspaces.
 
-Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
+The home of this repository is at [github][github] with an automated mirror at
+[gitlab][gitlab].
 
 ## Feedback
 
@@ -13,6 +14,8 @@ Please use the [issues][issues] section of this repository at [github][github]
 for feedback. 
 
 ## Build
+
+### Manual Build
 
 To be able to support `docker in docker` creation of containers, we had to
 prepare a new base-container with [Alpine Linux][alpine], JDK11, and
@@ -41,17 +44,21 @@ docker build -t provocon/coremedia-build:latest .
 docker push provocon/coremedia-build:1907.1
 docker push provocon/coremedia-build:1907
 docker push provocon/coremedia-build:latest
+```
 
-**Alternatively you could use the [Gradle Build Tool][gradle] and issue**
+### Scripted Build
 
-````shell script
+Alternatively you could use the [Gradle Build Tool][gradle] and issue
+
+```
 gradle -PbuildTag=1907.1  dockerPush
 gradle -PbuildTag=1907    dockerPush
 gradle -PbuildTag=lastest dockerPush
-````             
+```             
 
-which does all the steps above for you.
- 
+which does all the steps above for you except building the base-container.
+
+
 ## Test
 
 Test the generated resulting container with
