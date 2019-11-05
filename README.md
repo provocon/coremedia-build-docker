@@ -7,6 +7,11 @@ Context 3 workspaces.
 
 Find mirrors of this git repository at [gitlab][gitlab] and [github][github].
 
+## Feedback
+
+Please use the [issues][issues] section of this repository at [github][github] 
+for feedback. 
+
 ## Build
 
 To be able to support `docker in docker` creation of containers, we had to
@@ -36,30 +41,32 @@ docker build -t provocon/coremedia-build:latest .
 docker push provocon/coremedia-build:1907.1
 docker push provocon/coremedia-build:1907
 docker push provocon/coremedia-build:latest
-```    
+
 **Alternatively you could use the [Gradle Build Tool][gradle] and issue**
+
 ````shell script
 gradle -PbuildTag=1907.1  dockerPush
 gradle -PbuildTag=1907    dockerPush
-gradle -PbuildTag=latest dockerPush
+gradle -PbuildTag=lastest dockerPush
 ````             
+
 which does all the steps above for you.
  
-
 ## Test
 
-Test the generated interim container with
-
-```
-$ docker run --name mvn --rm -it --entrypoint=mvn provocon/alpine-jdk11-maven3.6 -v
-Apache Maven 3.6.1 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T19:00:29Z)
-Maven home: /usr/share/maven
-Java version: 11, vendor: Oracle Corporation, runtime: /opt/java/openjdk
-Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
-```
-
 Test the generated resulting container with
+
+```
+$ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
+Client: Docker Engine - Community
+ Version:           19.03.4
+ API version:       1.40
+ Go version:        go1.12.10
+ Git commit:        9013bf583a
+ Built:             Fri Oct 18 15:49:05 2019
+ OS/Arch:           linux/amd64
+ Experimental:      false
+```
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
@@ -68,15 +75,23 @@ Maven home: /usr/share/maven
 Java version: 11, vendor: Oracle Corporation, runtime: /opt/java/openjdk
 Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
-$ docker run --name mvn --rm -it --entrypoint=sencha provocon/coremedia-build which
+```
+
+```
+$ docker run --name sencha --rm -it --entrypoint=sencha provocon/coremedia-build which
 Sencha Cmd v6.7.0.63
 /usr/local/sencha/6.7.0.63/
+```
+
+```
+$ docker run --name phantomjs --rm -it --entrypoint=phantomjs provocon/coremedia-build -v
+2.1.1
 ```
 
 To call the container image use
 
 ```
-docker run -it provocon/coremedia-build bash
+docker run -it provocon/coremedia-build
 ```
 
 ## Availability
@@ -89,10 +104,12 @@ This container is intended for use in container based CI system like the
 [GitLab][gitlabci] CI. An example starting point is included with this 
 repository.
 
-## Feedback
+See example directory with a usage example and mind the essential parameters
+when building CoreMedia Content Cloud with [Maven][maven]:
 
-Please use the [issues][issues] section of this repository at [github][github] 
-for feedback. 
+```
+mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+```
 
 [sencha]: https://www.sencha.com/products/extjs/cmd-download/
 [coremedia]: http://www.coremedia.com/

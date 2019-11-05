@@ -60,6 +60,7 @@ deployment_scripts:
     expire_in: 3 days
 
 # Generate and store deployment archive - could be modified to just hold the maven repository
+# Runs tests and runs build as non root user (which seems to be not strictly necessary anymore)
 coremedia_cms:
   stage: build
   script: 
@@ -87,7 +88,7 @@ coremedia_cms:
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' global/deployment/chef/src/assembly/deployment-archive.xml
   - chown -R build apps
   - chown -R build frontend
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
   - rm -rf repository/com/coremedia/blueprint
   - mv /home/build/.cache/yarn .
   - echo -n "Repo size after job "
@@ -105,7 +106,7 @@ coremedia_cms:
     - deployment-archive.tar.xz
     expire_in: 3 days
 
-# Generate containers
+# Generate containers with unit tests
 containers:
   stage: build
   script:
@@ -122,12 +123,13 @@ containers:
   - find repository -type f| wc -l
   - find .remote-packages -type f| wc -l
   - find ~/.cache -type f| wc -l
-  - mvn clean install -Pwith-docker -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - mvn clean install -Pwith-docker -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
   - rm -rf repository/com/coremedia/blueprint
-  - mv ~/.cache/yarn .
+  - test -d ~/.cache/yarn && mv ~/.cache/yarn .
   - echo -n "Repo size after job "
   - du -sh repository
   - du -sh .remote-packages
+  - du -sh .cache
   - du -sh yarn
   - find repository -type f| wc -l
   - find yarn -type f| wc -l
