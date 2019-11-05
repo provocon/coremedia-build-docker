@@ -44,7 +44,7 @@ docker build -t provocon/coremedia-build:latest .
 docker push provocon/coremedia-build:1907.1
 docker push provocon/coremedia-build:1907
 docker push provocon/coremedia-build:latest
-```    
+```
 
 ### Scripted Build
 
@@ -54,10 +54,10 @@ Alternatively you could use the [Gradle Build Tool][gradle] and issue
 gradle -PbuildTag=1907.1  dockerPush
 gradle -PbuildTag=1907    dockerPush
 gradle -PbuildTag=latest dockerPush
-```             
+```
 
 which does all the steps above for you except building the base-container.
- 
+
 
 ## Test
 
