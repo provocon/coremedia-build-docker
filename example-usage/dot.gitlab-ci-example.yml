@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2019 Martin Goellnitz.
+# Copyright 2017-2019 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,10 +44,14 @@ variables:
 # better compression this still results in approximately 35% smaller files to
 # store and transfer on each build.
 
+# https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
+services:
+  - docker:19.03.1-dind
+
 # Just an example to separate deployment scripts from artifact store - not used subsequently
 deployment_scripts:
   stage: build
-  script: 
+  script:
   - cp -rdp global/deployment/chef chef-repo
   - rm -rf src
   - rm -rf target
@@ -59,15 +63,45 @@ deployment_scripts:
     - deployment-scripts.tar.xz
     expire_in: 3 days
 
+# Generate containers with unit tests
+create_containers:
+  stage: build
+  script:
+  - mkdir -p ~/.m2
+  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+  - mkdir -p repository
+  - mkdir -p .remote-packages
+  - rm -rf repository/com/coremedia/blueprint
+  - echo "Repo size after cache extraction and artifacts transfer "
+  - du -sh repository
+  - du -sh .remote-packages
+  - find repository -type f| wc -l
+  - find .remote-packages -type f| wc -l
+  - mvn clean install -Pwith-docker -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}")
+  - |
+    for coremImage in $coremImages
+    do
+      newImageName="$(echo $coremImage | sed s/coremedia/registry.gitlab.com\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}/):latest"
+      docker tag $coremImage $newImageName
+      docker push $newImageName
+    done
+  - docker images --filter=reference='coremedia/*:latest'
+  - rm -rf repository/com/coremedia/blueprint
+  - echo -n "Repo size after job "
+  - du -sh repository
+  - du -sh .remote-packages
+  - find repository -type f| wc -l
+  - ls -l
+
 # Generate and store deployment archive - could be modified to just hold the maven repository
 # Runs tests and runs build as non root user (which seems to be not strictly necessary anymore)
-coremedia_cms:
+deployment_archive:
   stage: build
-  script: 
+  script:
   - mkdir /home/build
   - mkdir -p /home/build/.m2
-  - mkdir -p /home/build/.cache
-  - test -d yarn && mv yarn /home/build/.cache
   - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
   - adduser -D -h /home/build build
   - chown -R build /home/build
@@ -81,22 +115,17 @@ coremedia_cms:
   - echo "Repo size after cache extraction and artifacts transfer "
   - du -sh repository
   - du -sh .remote-packages
-  - du -sh /home/build/.cache
   - find repository -type f| wc -l
   - find .remote-packages -type f| wc -l
-  - find /home/build/.cache -type f| wc -l
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' global/deployment/chef/src/assembly/deployment-archive.xml
   - chown -R build apps
   - chown -R build frontend
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
   - rm -rf repository/com/coremedia/blueprint
-  - mv /home/build/.cache/yarn .
   - echo -n "Repo size after job "
   - du -sh repository
   - du -sh .remote-packages
-  - du -sh yarn
   - find repository -type f| wc -l
-  - find yarn -type f| wc -l
   - mv global/deployment/chef/target/deployment-archive.tar .
   - cat deployment-archive.tar | parallel --block 256m --pipe --recend '' -k xz -9 >deployment-archive.tar.xz
   - ls -l
@@ -106,37 +135,8 @@ coremedia_cms:
     - deployment-archive.tar.xz
     expire_in: 3 days
 
-# Generate containers with unit tests
-containers:
-  stage: build
-  script:
-  - test -d yarn && mv yarn ~/.cache
-  - mkdir -p ~/.m2
-  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
-  - mkdir -p repository
-  - mkdir -p .remote-packages
-  - rm -rf repository/com/coremedia/blueprint
-  - echo "Repo size after cache extraction and artifacts transfer "
-  - du -sh repository
-  - du -sh .remote-packages
-  - du -sh ~/.cache
-  - find repository -type f| wc -l
-  - find .remote-packages -type f| wc -l
-  - find ~/.cache -type f| wc -l
-  - mvn clean install -Pwith-docker -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
-  - rm -rf repository/com/coremedia/blueprint
-  - test -d ~/.cache/yarn && mv ~/.cache/yarn .
-  - echo -n "Repo size after job "
-  - du -sh repository
-  - du -sh .remote-packages
-  - du -sh .cache
-  - du -sh yarn
-  - find repository -type f| wc -l
-  - find yarn -type f| wc -l
-  - ls -l
-
 # Simple All-In-One-Deployment from the chef deployment archive
-deploy_cms:
+deploy_from_archive:
   stage: test
   script:
   - ls -l
@@ -157,10 +157,9 @@ deploy_cms:
   - $SSH "chef-solo --config $INSTALL/chef-repo/.chef/solo.rb --environment development --json-attributes $INSTALL/chef-repo/nodes/$NODE.json"
   - $SSH "rm -f /tmp/maven-repo /tmp/content-users.zip"
   dependencies:
-  - coremedia_cms
+  - deployment_archive
 
 cache:
   paths:
   - repository/
   - .remote-packages/
-  - yarn/
