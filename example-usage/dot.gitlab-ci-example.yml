@@ -96,21 +96,13 @@ create_containers:
   - ls -l
 
 # Generate and store deployment archive - could be modified to just hold the maven repository
-# Runs tests and runs build as non root user (which seems to be not strictly necessary anymore)
 deployment_archive:
   stage: build
   script:
-  - mkdir /home/build
-  - mkdir -p /home/build/.m2
-  - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
-  - adduser -D -h /home/build build
-  - chown -R build /home/build
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
   - mkdir -p repository
-  - chown -R build repository
   - mkdir -p .remote-packages
-  - chown -R build .remote-packages
   - rm -rf repository/com/coremedia/blueprint
   - echo "Repo size after cache extraction and artifacts transfer "
   - du -sh repository
@@ -118,9 +110,7 @@ deployment_archive:
   - find repository -type f| wc -l
   - find .remote-packages -type f| wc -l
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' global/deployment/chef/src/assembly/deployment-archive.xml
-  - chown -R build apps
-  - chown -R build frontend
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER CI_PROJECT_DIR=$CI_PROJECT_DIR JAVA_HOME=$JAVA_HOME mvn clean install -Pwith-chef -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+  - mvn clean install -Pwith-chef -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
   - rm -rf repository/com/coremedia/blueprint
   - echo -n "Repo size after job "
   - du -sh repository
