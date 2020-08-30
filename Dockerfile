@@ -18,7 +18,7 @@ FROM provocon/alpine-docker-jdk11-maven3.6:latest
 #################################################
 # ----------------SenchaCmd----------------------
 #################################################
-ARG SENCHA_VERSION=6.7.0.63
+ARG SENCHA_VERSION=7.2.0.56
 ENV PATH $PATH:/usr/local/sencha
 
 RUN \
