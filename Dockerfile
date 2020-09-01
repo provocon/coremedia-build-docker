@@ -23,7 +23,7 @@ ENV PATH $PATH:/usr/local/sencha
 
 RUN \
   apk update && \
-  apk add xz zip p7zip parallel sudo git && \
+  apk add xz zip p7zip parallel sudo git bash && \
   apk add font-noto && \
   fc-cache -fv && \
   curl -o /usr/local/sencha.zip http://cdn.sencha.com/cmd/${SENCHA_VERSION}/no-jre/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh.zip && \
@@ -55,3 +55,5 @@ ENV CHROMEDRIVER_URL_BASE ''
 ENV CHROMEDRIVER_EXTRA_ARGS ''
 
 EXPOSE 4444
+
+CMD ["bash"]
