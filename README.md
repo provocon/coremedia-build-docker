@@ -2,7 +2,7 @@
 
 This repository contains the necessary parts to create a Docker container with
 the few required tools to build [CoreMedia][coremedia] Plattform 17nm, 18nm, 
-or 19nm as used in CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live 
+19nm, and 20nm as used in CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live
 Context 3 workspaces.
 
 The home of this repository is at [github][github] with an automated mirror at
@@ -35,14 +35,14 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:1907.1 .
-docker build -t provocon/coremedia-build:1907 .
+docker build -t provocon/coremedia-build:2007.1 .
+docker build -t provocon/coremedia-build:2007 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:1907.1
-docker push provocon/coremedia-build:1907
+docker push provocon/coremedia-build:2007.1
+docker push provocon/coremedia-build:2007
 docker push provocon/coremedia-build:latest
 ```
 
@@ -51,8 +51,8 @@ docker push provocon/coremedia-build:latest
 Alternatively you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-gradle -PbuildTag=1907.1  dockerPush
-gradle -PbuildTag=1907    dockerPush
+gradle -PbuildTag=2007.1  dockerPush
+gradle -PbuildTag=2007    dockerPush
 gradle -PbuildTag=latest dockerPush
 ```
 
