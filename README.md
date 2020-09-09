@@ -13,6 +13,30 @@ The home of this repository is at [github][github] with an automated mirror at
 Please use the [issues][issues] section of this repository at [github][github] 
 for feedback. 
 
+## Goals
+
+This container is intended for use in container based CI system like the
+[GitLab][gitlabci] CI. An example starting point is included with this 
+repository.
+
+See example directory with a usage example and mind the essential parameters
+when building CoreMedia Content Cloud with [Maven][maven]:
+
+```
+mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+```
+
+## Availability
+
+This container can be used via the canonical name `provocon/coremedia-build`.
+The tag `lates` should be expected to usable for the latest release by 
+[CoreMedia][coremedia].
+
+Tags are named after the first release for which the implemented changed are
+required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
+`1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
+is the first release for CMCC-10. It can be used at least up to CMCC-10-2004.
+
 ## Build
 
 ### Manual Build
@@ -94,23 +118,6 @@ To call the container image use
 
 ```
 docker run -it provocon/coremedia-build
-```
-
-## Availability
-
-This container can be used via the canonical name `provocon/coremedia-build`.
-
-## Goals
-
-This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI. An example starting point is included with this 
-repository.
-
-See example directory with a usage example and mind the essential parameters
-when building CoreMedia Content Cloud with [Maven][maven]:
-
-```
-mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
 ```
 
 [sencha]: https://www.sencha.com/products/extjs/cmd-download/
