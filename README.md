@@ -29,7 +29,7 @@ mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.v
 ## Availability
 
 This container can be used via the canonical name `provocon/coremedia-build`.
-The tag `lates` should be expected to usable for the latest release by 
+The tag `latest` should be expected to usable for the latest release by
 [CoreMedia][coremedia].
 
 Tags are named after the first release for which the implemented changed are
