@@ -1,0 +1,72 @@
+#
+# Copyright 2020 Provocon.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Relies on the following Variables to be set:
+#
+# External Container Repository:
+#   DH_REGISTRY_USER
+#   DH_REGISTRY_PASSWORD
+image: provocon/coremedia-build:latest
+
+services:
+  - docker:dind
+
+stages:
+  - image
+
+variables:
+  BASE_NAME: coremedia-build
+  IMAGE_NAME: "${CI_PROJECT_NAMESPACE}/$BASE_NAME"
+  TAG: "2007.1"
+  SHORT_TAG: "2007"
+
+build:
+  stage: image
+  script:
+    - ./gradlew -PbuildTag=$TAG docker
+    - docker images
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo $IMAGE_NAME
+    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
+    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
+    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
+    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
+    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
+    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
+    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+  artifacts:
+    paths:
+    - build/*.ci
+    expire_in: 5 days
+    name: ${CI_BUILD_STAGE}
+
+release:
+  stage: image
+  only:
+    - tags
+  script:
+    - ./gradlew -PbuildTag=$TAG docker
+    - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
+    - echo $IMAGE_NAME
+    - docker tag "${IMAGE_NAME}:$TAG" "${IMAGE_NAME}:$SHORT_TAG"
+    - docker tag "${IMAGE_NAME}:$TAG" "${IMAGE_NAME}:latest"
+    - docker push "${IMAGE_NAME}:$TAG"
+    - docker push "${IMAGE_NAME}:$SHORT_TAG"
+    - docker push "${IMAGE_NAME}:latest"
+    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+  artifacts:
+    paths:
+    - build/*.ci
+    name: ${CI_BUILD_STAGE}
