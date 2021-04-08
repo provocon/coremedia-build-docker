@@ -32,10 +32,11 @@ This container can be used via the canonical name `provocon/coremedia-build`.
 The tag `latest` should be expected to usable for the latest release by
 [CoreMedia][coremedia].
 
-Tags are named after the first release for which the implemented changed are
+Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
-is the first release for CMCC-10. It can be used at least up to CMCC-10-2004.
+is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
+The latest Tag works with - at least again - CMCC-10-2101.
 
 ## Build
 
@@ -59,14 +60,14 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:2007.1 .
-docker build -t provocon/coremedia-build:2007 .
+docker build -t provocon/coremedia-build:2101.1 .
+docker build -t provocon/coremedia-build:2101 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2007.1
-docker push provocon/coremedia-build:2007
+docker push provocon/coremedia-build:2101.1
+docker push provocon/coremedia-build:2101
 docker push provocon/coremedia-build:latest
 ```
 
@@ -75,8 +76,8 @@ docker push provocon/coremedia-build:latest
 Alternatively you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-gradle -PbuildTag=2007.1  dockerPush
-gradle -PbuildTag=2007    dockerPush
+gradle -PbuildTag=2101.1 dockerPush
+gradle -PbuildTag=2101   dockerPush
 gradle -PbuildTag=latest dockerPush
 ```
 
@@ -110,8 +111,8 @@ OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
 
 ```
 $ docker run --name sencha --rm -it --entrypoint=sencha provocon/coremedia-build which
-Sencha Cmd v6.7.0.63
-/usr/local/sencha/6.7.0.63/
+Sencha Cmd v7.2.0.56
+/usr/local/sencha/7.2.0.56/
 ```
 
 To call the container image use
