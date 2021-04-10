@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2019 Martin Goellnitz.
+# Copyright 2017-2021 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@
 #   AIO_PASSWORD - ssh key archive file password for extraction
 #   NODE         - name of the node definition JSON file for chef
 #
-image: provocon/coremedia-build:latest
+image: provocon/coremedia-build:1904
 
 stages:
   - build
@@ -63,27 +63,28 @@ deployment_scripts:
 coremedia_cms:
   stage: build
   script: 
-  - mkdir /home/build
-  - mkdir -p /home/build/.m2
-  - cp workspace-configuration/maven-settings.xml /home/build/.m2/settings.xml
-  - useradd -d /home/build build
-  - chown -R build /home/build
   - mkdir -p ~/.m2
-  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+  - mkdir -p ~/.cache
   - mkdir -p repository
+  - mkdir -p .remote-packages
+  - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
   - rm -rf repository/com/coremedia/blueprint
   - echo "Repo size after cache extraction and artifacts transfer "
-  - du -sm repository
+  - du -sh repository
+  - du -sh .remote-packages
   - find repository -type f| wc -l
+  - find .remote-packages -type f| wc -l
   - sed -i -e 's/format.zip..format/format>tar<\/format/g' deployment/chef/src/assembly/deployment-archive.xml
-  - chown -R build modules
-  - sudo -u build env PATH=$PATH CM_MAVEN_PASSWORD=$CM_MAVEN_PASSWORD CM_MAVEN_USER=$CM_MAVEN_USER JAVA_HOME=$JAVA_HOME mvn clean install -B -DskipTests=true -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
+  - mvn clean install -B -DskipContent -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' -DfailIfNoTests=false  -Dorg.slf4j.simpleLogger.defaultLogLevel=warn
   - rm -rf repository/com/coremedia/blueprint
   - echo -n "Repo size after job "
-  - du -sm repository
+  - du -sh repository
+  - du -sh .remote-packages
   - find repository -type f| wc -l
+  - find .remote-packages -type f| wc -l
   - mv deployment/chef/target/deployment-archive.tar .
-  - xz -9 deployment-archive.tar
+  # - xz -9 deployment-archive.tar
+  - cat deployment-archive.tar | parallel --block 256m --pipe --recend '' -k xz -9 >deployment-archive.tar.xz
   - ls -l
   artifacts:
     name: deployment-archive-${CI_COMMIT_REF_NAME}
@@ -94,6 +95,7 @@ coremedia_cms:
 # Simple All-In-One-Deployment from the deployment archive
 deploy_cms:
   stage: test
+  when: manual
   script:
   - ls -l
   - 7z x -p$AIO_PASSWORD ${AIO_KEY}.7z
@@ -101,7 +103,7 @@ deploy_cms:
   - $SSH "test -d $INSTALL || mkdir -p $INSTALL"
   - $SSH "test -d $SOURCE || mkdir -p $SOURCE"
   - scp -i ${AIO_KEY}.openssh deployment-archive.tar.xz $AIO_HOST:$SOURCE/deployment-archive.tar.xz
-  - $SSH "rm -rf $INSTALL/* ; cd $INSTALL ; tar xvJf $SOURCE/deployment-archive.tar.xz"
+  - $SSH "rm -rf $INSTALL/* ; cd $INSTALL ; tar xJf $SOURCE/deployment-archive.tar.xz"
   - $SSH "rm -f $SOURCE/deployment-archive.tar.xz"
   - $SSH "test -d /tmp/maven-repo || ln -s $INSTALL/maven-repo /tmp/maven-repo"
   - $SSH "test -f /tmp/content-users.zip || ln -s $INSTALL/content-users.zip /tmp/content-users.zip"
