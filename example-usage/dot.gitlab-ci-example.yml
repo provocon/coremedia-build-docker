@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2019 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2021 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ services:
 # Just an example to separate deployment scripts from artifact store - not used subsequently
 deployment_scripts:
   stage: build
+  when: manual
   script:
   - cp -rdp global/deployment/chef chef-repo
   - rm -rf src
@@ -67,6 +68,7 @@ deployment_scripts:
 create_containers:
   stage: build
   script:
+  - docker info
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
   - mkdir -p repository
@@ -77,7 +79,14 @@ create_containers:
   - du -sh .remote-packages
   - find repository -type f| wc -l
   - find .remote-packages -type f| wc -l
-  - mvn clean install -Pwith-docker -B -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dwebdriver.chrome.driver=/usr/bin/chromedriver -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+  - | # We skip coremedia tests in favour of our project tests
+    mvn install -Pwith-docker -Dmaven.compiler.forceJavacCompilerUse=true \
+    -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
+    -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
+    -Dwebdriver.chrome.verboseLogging=true \
+    -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
+    -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
+    -DfailIfNoTests=false
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}")
   - |
@@ -98,6 +107,7 @@ create_containers:
 # Generate and store deployment archive - could be modified to just hold the maven repository
 deployment_archive:
   stage: build
+  when: manual
   script:
   - mkdir -p ~/.m2
   - cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -128,6 +138,7 @@ deployment_archive:
 # Simple All-In-One-Deployment from the chef deployment archive
 deploy_from_archive:
   stage: test
+  when: manual
   script:
   - ls -l
   - 7z x -p$AIO_PASSWORD ${AIO_KEY}.7z
