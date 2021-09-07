@@ -1,0 +1,25 @@
+#
+# Copyright 2021 Markus Schwarz.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+FROM provocon/coremedia-build:latest
+
+RUN apk add --update iptables gcc python3 python3-dev \
+			&& curl https://bootstrap.pypa.io/pip/get-pip.py -o get-pip.py \
+			&& python3 get-pip.py \
+			&& ln -s /usr/bin/python3 /bin/python
+
+RUN git clone https://github.com/sshuttle/sshuttle.git \
+			&& cd sshuttle \
+			&& ./setup.py install
