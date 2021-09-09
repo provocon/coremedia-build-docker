@@ -21,22 +21,50 @@ pipeline {
       }
       steps {
         script {
-          dir('.') {
-            try {
-              sh label: 'cmcc_build', script: '''              
-              mkdir ~/.ssh
-              chmod 600 workspace-configuration/id_rsa_CLIENTNAME_jenkins
-              cp workspace-configuration/id_rsa_CLIENTNAME_jenkins ~/.ssh               
-              cp workspace-configuration/ssh-config ~/.ssh/config
-              ssh-keyscan -t rsa bastion.sandbox.CLIENTNAME.coremedia.cloud >> ~/.ssh/known_hosts
+          withCredentials([sshUserPrivateKey(credentialsId: "jenkins_cmcc-s_user_private_key", keyFileVariable: 'keyfile')]) {
+            env.GIT_COMMIT = sh(script: "git rev-parse HEAD", returnStdout: true)
+            env.GIT_AUTHOR = sh(script: "git log -1 --pretty=%cn ${GIT_COMMIT}", returnStdout: true).trim()
+            env.GIT_EMAIL = sh(script: "git log -1 --pretty=%ae ${GIT_COMMIT}", returnStdout: true).trim()
+
+            def onboardedDevelopers = [
+                'John Doe',
+                'Max Mustermann'
+            ]
+
+            if (GIT_AUTHOR in onboardedDevelopers && buildRequired()) {
+              println("Committer has access to VF Jenkins. Build starts now.")
+              dir('.') {
+                try {
+                  sh label: 'cmcc_build', script: '''
+                  du -s -h mvn_repo || true
               
-              sshuttle --no-latency-control -l 0.0.0.0:0 -r bastion.sandbox.CLIENTNAME.coremedia.cloud 172.16.0.0/16 --daemon
-              
-              STUFF_TO_SKIP="-DskipThemes=true -DskipContent=true -Dskip-joo-unit-tests=true -DskipTests -Dmdep.analyze.skip=true -Denforcer.skip=true"                                   
-              mvn -s workspace-configuration/settings.xml install $STUFF_TO_SKIP                     
-              '''
-            } finally {
-              sh label: 'reset_permissions', script: 'chmod -R 777 .'
+                  mkdir ~/.ssh                  
+                  chmod 600 ${keyfile}              
+                  cp ${keyfile} ~/.ssh/id_rsa_cmcc-s_jenkins
+                  echo "Host bastion.sandbox.CUSTOMER.coremedia.cloud"      >  ~/.ssh/config 
+                  echo "    User bastion"                              >> ~/.ssh/config
+                  echo "    IdentityFile ~/.ssh/id_rsa_cmcc-s_jenkins" >> ~/.ssh/config
+                  
+                  ssh-keyscan -t rsa bastion.sandbox.CUSTOMER.coremedia.cloud >> ~/.ssh/known_hosts
+                  sshuttle --no-latency-control -l 0.0.0.0:0 -r bastion.sandbox.CUSTOMER.coremedia.cloud 172.16.0.0/16 --daemon
+                  
+                  RUN_UNATTENDED="--batch-mode"
+                  NO_DWNLD_PRGRS="--no-transfer-progress" 
+                  STORE_MVN_REPO_IN_WORKSPACE="-Dmaven.repo.local=mvn_repo"
+                  SETTINGS_FILE="-s workspace-configuration/settings.xml"              
+                  
+                  # Just in case of absolute emergency: -Dmdep.analyze.skip=true -Denforcer.skip=true -DskipTests 
+                  
+                  STUFF_TO_SKIP="-DskipThemes=true -DskipContent=true -Dskip-joo-unit-tests=true -DfailIfNoTests=false -Dtest=!%regex[com.coremedia.*]"
+                  
+                  mvn $RUN_UNATTENDED $NO_DWNLD_PRGRS $STORE_MVN_REPO_IN_WORKSPACE $SETTINGS_FILE install $STUFF_TO_SKIP                     
+                  '''
+                } finally {
+                  sh label: 'reset_permissions', script: 'chmod -R 777 .'
+                }
+              }
+            } else {
+              println("Committer has no access to VF Jenkins, so this build does noting.")
             }
           }
         }
@@ -44,12 +72,45 @@ pipeline {
     }
   }
   post {
+    failure {
+      node('master') {
+        emailext body: "Dear ${GIT_AUTHOR},\n\nbuild ${BUILD_URL} failed.", subject: 'Sorry fellow, it seems that you broke the coremedia-application build. Please have a look on it.', to: "${GIT_EMAIL}"
+      }
+    }
     always {
       node('master') {
         notifyBitbucket commitSha1: '', considerUnstableAsSuccess: false, credentialsId: 'ci-cd-emea-bitbucket-user-id',
             disableInprogressNotification: false, ignoreUnverifiedSSLPeer: false, includeBuildNumberInKey: false,
-            prependParentProjectKey: false, projectKey: '', stashServerBaseUrl: 'https://digital.CLIENTNAME.com/stash',
+            prependParentProjectKey: false, projectKey: '', stashServerBaseUrl: 'https://digital.CUSTOMER.com/stash',
             buildName: BUILD_DISPLAY_NAME, buildStatus: env.BUILD_STATUS
+      }
+    }
+  }
+}
+
+def buildRequired() {
+  def changeLogSets = currentBuild.changeSets // echo "changeLogSets.size=${changeLogSets.size()}"
+
+  def changePatternsToIgnoreForBuild = [
+      'content/modules/extensions/.*\\.xml',
+      '.*\\.properties'
+  ]
+
+  for (int i = 0; i < changeLogSets.size(); i++) {
+    def entries = changeLogSets[i].items
+    for (int j = 0; j < entries.length; j++) {
+      def entry = entries[j]
+      // echo "${entry.commitId} by ${entry.author} on ${new Date(entry.timestamp)}: ${entry.msg}"
+      def files = new ArrayList(entry.affectedFiles)
+      for (int k = 0; k < files.size(); k++) {
+        def file = files[k]
+        for (changePatternToIgnoreForBuild in changePatternsToIgnoreForBuild) {
+          echo "Checking ${file.path} against ${changePatternToIgnoreForBuild}"
+          if (!file.path.matches(changePatternToIgnoreForBuild)) {
+            echo "${file.path} did not match. So we have to build the project."
+            return true
+          }
+        }
       }
     }
   }

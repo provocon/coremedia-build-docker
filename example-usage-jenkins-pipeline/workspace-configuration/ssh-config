@@ -1,3 +1,0 @@
-Host bastion.sandbox.CLIENTNAME.coremedia.cloud
-    User bastion
-    IdentityFile ~/.ssh/id_rsa_CLIENTNAME_jenkins
