@@ -49,13 +49,6 @@ variables: &dockerInDockerBuildVars
   # thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
 
-.variables: &gitlabRegistryVars
-  CONT_REGISTRY: $CI_REGISTRY
-  CONT_REGISTRY_PATH: "$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}"
-  CONT_REGISTRY_USER: $CI_REGISTRY_USER
-  CONT_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  LEFT_OUT_CONTAINER: studio-client-k8s
-
 # Generate and store deployment archives as docker containers
 Create-Containers:
   stage: build
@@ -77,10 +70,13 @@ Create-Containers:
     - mkdir -p .remote-packages
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
-    # release and provider tagging
+    # release and provider tagging - some tweaks to handle branch and tag name patterns
+    # Branch names starting with cmcc- are considered work in progress and packages thus
+    # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
+    # this: We will find out.
     - sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
-    - VERSION_AFTER=$(echo "${CI_COMMIT_REF_NAME}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/cmcc/1-SNAPSHOT/g')
-    - VERSION_STRING=`head -15 pom.xml |tail -14 |grep version`
+    - VERSION_AFTER=$(echo "${CI_COMMIT_REF_NAME}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
+    - VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
     - VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
     - echo "$VERSION_BEFORE -> $VERSION_AFTER"
     - find -name pom.xml -exec sed -i "s/version.$VERSION_BEFORE..version/version\\>$VERSION_AFTER\\<\\/version/" {} \;
@@ -89,44 +85,40 @@ Create-Containers:
     ####################################################################
     # Jangaroo unit tests were skipped with -Dskip-joo-unit-tests=true because currently they are 100% from
     # CoreMedia.
-    # If we supply our own, we should enable them and should investigate, if BMPCMS-6232 is still an issue.
+    # Also CoreMedia tests are skipped in favor of project specific tests to save our time.
     #
     - | # We skip frontend and content module processing with: skipContent=true & skipThemes=true
-      mvn install -Pwith-docker -Dmaven.compiler.forceJavacCompilerUse=true \
+      mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
       -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
       -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
       -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
       -Dwebdriver.chrome.verboseLogging=true \
       -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-      -Dtest='!com.coremedia.**,!ProspectServiceTest,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
+      -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
       -DfailIfNoTests=false
     ###################################################################
     - rm -rf $(find $CI_PROJECT_DIR/repository/com/coremedia/blueprint -type d|grep -v blueprint.base)
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
     - mkdir -p container
-    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy|grep -v site-manager)
+    - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"
+    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)
     - |
       for coremImage in $coremImages ; do
         filename="$(echo $coremImage | sed s/coremedia.//)"
         docker image save -o container/${filename}.ci $coremImage
       done
       du -sm container/*
-    - |
-      for ci in $(find container -type f|grep -v ${LEFT_OUT_CONTAINER}.ci) ; do
-        docker load < ${ci}
-      done
-    - docker images --filter=reference='coremedia/*:latest'
-    - docker login -u $CONT_REGISTRY_USER -p $CONT_REGISTRY_PASSWORD $CONT_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - imageTag=$(echo $CI_COMMIT_REF_NAME|sed -e 's/^v\([0-9][0-9\.]*\)-CMCC/\1/g')
-    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}")
     # We push to the branch name tags for snapshots and to $CI_COMMIT_REF_NAME and latest for releases.
-    # This also is taken into account in startAll.sh. Keep in mind that this could blow disk space at the target envs
-    # and in gitlab's container registry. (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
+    # Release tags are recognized by names starting with v like in v1.2.4.
+    # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry. 
+    # (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
     - |
       for coremImage in $coremImages ; do
         filename="$(echo $coremImage | sed s/coremedia.//)"
-        newImageName="$(echo $coremImage | sed s/coremedia/$CONT_REGISTRY_PATH/)"
+        newImageName="$(echo $coremImage | sed s/coremedia/$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}/)"
         echo "$filename: $coremImage  - $newImageName"
         if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker tag $coremImage "${newImageName}:latest" ; fi
         docker tag $coremImage "${newImageName}:$imageTag"
