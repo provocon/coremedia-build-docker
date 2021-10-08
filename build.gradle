@@ -46,7 +46,7 @@ task buildBaseImage(type: Exec) {
   println "************************"
   println "Using buildTag=$buildTag"
   println "************************"
-  commandLine getCmd("docker build -f Dockerfile.alpine-docker-jdk11-maven3.6 -t provocon/alpine-docker-jdk11-maven3.6:latest .")
+  commandLine getCmd("docker build -f Dockerfile.alpine-docker-jdk11-maven3.8 -t provocon/alpine-docker-jdk11-maven3.8:latest .")
 }
 
 /* Build and push the final image to https://hub.docker.com/r/provocon/coremedia-build/tags with "gradle dockerPush" */

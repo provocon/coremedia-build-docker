@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2019 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2021 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM provocon/alpine-docker-jdk11-maven3.6:latest
+FROM provocon/alpine-docker-jdk11-maven3.8:latest
 
 #################################################
 # ----------------SenchaCmd----------------------
 #################################################
-ARG SENCHA_VERSION=7.2.0.56
+ARG SENCHA_VERSION=7.2.0.84
 ENV PATH $PATH:/usr/local/sencha
 
 RUN \
