@@ -36,7 +36,7 @@ Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-10-2101.
+The latest Tag works with - at least again - CMCC-10-2107.
 
 ## Build
 
