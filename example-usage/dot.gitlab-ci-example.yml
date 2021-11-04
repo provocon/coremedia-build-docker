@@ -70,6 +70,10 @@ Create-Containers:
     - mkdir -p .remote-packages
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    # To support reproducable builds, CoreMedia uses a dummy date.
+    # We replace this by the commit date, which should also remain constant.
+    - BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
+    - find -name pom.xml -exec sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
     # release and provider tagging - some tweaks to handle branch and tag name patterns
     # Branch names starting with cmcc- are considered work in progress and packages thus
     # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
