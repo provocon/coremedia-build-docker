@@ -48,6 +48,9 @@ variables: &dockerInDockerBuildVars
   # https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
   # thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
+  # Seems necessary with kubernetes executor
+  # DOCKER_TLS_CERTDIR: ""
+  # DOCKER_HOST: tcp://docker:2375
 
 # Generate and store deployment archives as docker containers
 Create-Containers:
