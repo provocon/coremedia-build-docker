@@ -32,7 +32,8 @@ ARG MAVEN_BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/bina
 # values from Core package DB's gzipped tar file at
 # https://archive.archlinux.org/repos/<y>/<m>/<d>/core/os/x86_64/core.db
 RUN apk update \
-    && apk add --no-cache --virtual .build-deps curl binutils \
+    && apk add --no-cache curl \
+    && apk add --no-cache --virtual .build-deps binutils \
     && GLIBC_VER="2.34-r0" \
     && ALPINE_GLIBC_REPO="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" \
     && GCC_LIBS_URL="https://archive.archlinux.org/packages/g/gcc-libs/gcc-libs-9.2.0-4-x86_64.pkg.tar.xz" \
