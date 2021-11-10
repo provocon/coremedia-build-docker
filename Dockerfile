@@ -21,8 +21,10 @@ FROM provocon/alpine-docker-jdk11-maven3.8:latest
 ARG SENCHA_VERSION=7.2.0.84
 ENV PATH $PATH:/usr/local/sencha
 
+# The tools xz, zip, openssh etc are helpers for common .gitlab-ci usages
 RUN \
   apk update && \
+  apk upgrade && \
   apk add xz zip p7zip parallel sudo git bash openssh-client && \
   apk add font-noto && \
   fc-cache -fv && \
