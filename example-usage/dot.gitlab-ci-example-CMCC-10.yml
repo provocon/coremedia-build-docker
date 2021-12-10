@@ -18,6 +18,11 @@
 #
 # Relies on the following variables to be set for maven config:
 #
+# External Container Repository:
+#   EXTERNAL_REGISTRY
+#   EXTERNAL_REGISTRY_PATH
+#   EXTERNAL_REGISTRY_USER
+#   EXTERNAL_REGISTRY_PASSWORD
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
@@ -34,6 +39,7 @@ image: provocon/coremedia-build:latest
 stages:
   - create
   - deliver
+  - import
 
 variables:
   MAVEN_OPTS: $MAVEN_OPTS
@@ -49,13 +55,20 @@ variables:
   # DOCKER_TLS_CERTDIR: ""
   # DOCKER_HOST: tcp://docker:2375
 
+.variables: &gitlabRegistryVars
+  CONT_REGISTRY: $CI_REGISTRY
+  CONT_REGISTRY_PATH: "$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}"
+  CONT_REGISTRY_USER: $CI_REGISTRY_USER
+  CONT_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  LEFT_OUT_CONTAINER: studio-client-k8s
+
 # Generate and store deployment archives as docker containers
-Build:
+.create_containers: &createContainers
   stage: create
   # Cache downloaded dependencies and plugins between builds.
   # To keep cache across branches add key.
   cache:
-    key: "cmcc-11"
+    key: "cmcc-10"
     paths:
       - .remote-packages/
       - $CI_PROJECT_DIR/repository
@@ -63,10 +76,6 @@ Build:
   services:
     - docker:19.03.1-dind
   script:
-    # Pre-fill docker images to use locally with authenticated requests:
-    # - echo "Login in as _${DH_REGISTRY_USER}_"
-    # - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    # - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
     # Cache preparation and check
@@ -84,7 +93,7 @@ Build:
     # this: We will find out.
     - sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
     - VERSION_AFTER=$(echo "${CI_COMMIT_REF_NAME}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
-    - VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
+    - VERSION_STRING=`head -15 pom.xml |tail -14 |grep version`
     - VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
     - echo "$BUILD_DATE $VERSION_BEFORE -> $VERSION_AFTER"
     - |
@@ -94,13 +103,15 @@ Build:
       fi
     # Be snapshot safe
     - rm -rf $(find $CI_PROJECT_DIR/repository/com/coremedia -name "$VERSION_AFTER")
+    # Try docker login to extend download rate
+    - test ! -z "$DH_REGISTRY_USER" && docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
     #
     # Jangaroo unit tests were skipped with -Dskip-joo-unit-tests=true because currently they are 100% from
     # CoreMedia.
     # Also CoreMedia tests are skipped in favor of project specific tests to save our time.
     #
     - | # We skip frontend and content module processing with: skipContent=true & skipThemes=true
-      mvn install -Dmaven.compiler.forceJavacCompilerUse=true \
+      mvn install -Pwith-docker -Dmaven.compiler.forceJavacCompilerUse=true \
       -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
       -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
       -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
@@ -109,63 +120,12 @@ Build:
       -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
       -DfailIfNoTests=false
     #
-    - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
-
-# Package and Push Containers
-Push:
-  stage: deliver
-  cache:
-    key: "cmcc-11"
-    paths:
-      - .remote-packages/
-      - $CI_PROJECT_DIR/repository
-  # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
-  services:
-    - docker:19.03.1-dind
-  script:
-    # Use maven settings from workspace
-    - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
-    # Cache check - must not be empty
-    - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
-    # release and provider tagging - some tweaks to handle branch and tag name patterns
-    # Branch names starting with cmcc- are considered work in progress and packages thus
-    # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
-    # this: We will find out.
-    - sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
-    - VERSION_AFTER=$(echo "${CI_COMMIT_REF_NAME}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
-    - VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
-    - VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
-    - echo "$VERSION_BEFORE -> $VERSION_AFTER"
-    - |
-      if [ "$VERSION_BEFORE" = "$VERSION_AFTER" ] ; then
-        find -name pom.xml -exec sed -i "s/version.$VERSION_BEFORE..version/version\\>$VERSION_AFTER\\<\\/version/" {} \;
-        find -name pom.xml -exec sed -i "s/\(<cm.[a-z\-]*.bp.version>\)1-SNAPSHOT\(<\/.*>\)/\1$VERSION_AFTER\2/g" {} \;
-      fi
-    # Pre-fill docker images to use locally with authenticated requests:
-    - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
-    # Re-run maven with a pre-filled cache and now add image generation
-    # only in the needed submodules to avoid full re-build
-    - |
-      for PART in $(grep -l default-image $(find -name "pom.xml")) ; do
-        echo "Packaging $PART"
-        mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
-        -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
-        -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
-        -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
-        -Dwebdriver.chrome.verboseLogging=true \
-        -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
-        -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false -f $PART
-      done
-    #
     - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}} {{.Size}}"
     # select images to tag and push
-    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
     - imageTag=$(echo $CI_COMMIT_REF_NAME|sed -e 's/^v\([0-9][0-9\.]*\)-CMCC/\1/g')
+    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v studio-packages-proxy|grep -v site-manager|grep -v "${LEFT_OUT_CONTAINER}$")
+    # https://docs.gitlab.com/ee/user/packages/container_registry/#using-with-private-projects
+    - docker login -u $CONT_REGISTRY_USER -p $CONT_REGISTRY_PASSWORD $CONT_REGISTRY
     # We push to the branch name tags for snapshots and to $CI_COMMIT_REF_NAME and latest for releases.
     # Release tags are recognized by names starting with v like in v1.2.4.
     # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry. 
@@ -173,7 +133,7 @@ Push:
     - |
       for coremImage in $coremImages ; do
         filename="$(echo $coremImage | sed s/coremedia.//)"
-        newImageName="$(echo $coremImage | sed s/coremedia/$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}/)"
+        newImageName="$(echo $coremImage | sed s/coremedia/$CONT_REGISTRY_PATH/)"
         echo "$filename: $coremImage  - $newImageName"
         if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker tag $coremImage "${newImageName}:latest" ; fi
         docker tag $coremImage "${newImageName}:$imageTag"
@@ -184,3 +144,21 @@ Push:
     - rm -rf $(find $CI_PROJECT_DIR/repository/com/coremedia -name "$VERSION_AFTER")
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+
+Daily:
+  except:
+  - tags
+  variables:
+    <<: *gitlabRegistryVars
+  <<: *createContainers
+
+Release:
+  only:
+  - tags
+  variables:
+    CONT_REGISTRY: $EXTERNAL_REGISTRY
+    CONT_REGISTRY_PATH: "$EXTERNAL_REGISTRY\\/coremedia_cms"
+    CONT_REGISTRY_USER: $EXTERNAL_REGISTRY_USER
+    CONT_REGISTRY_PASSWORD: $EXTERNAL_REGISTRY_PASSWORD
+    LEFT_OUT_CONTAINER: studio-client
+  <<: *createContainers
