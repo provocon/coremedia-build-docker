@@ -15,9 +15,9 @@
 #
 FROM provocon/alpine-docker-jdk11-maven3.8:latest
 
-#################################################
-# ----------------SenchaCmd----------------------
-#################################################
+# Helm to support using charts from within your build:
+ARG HELM_VERSION=3.7.2
+# SenchaCmd:
 ARG SENCHA_VERSION=7.2.0.84
 ENV PATH $PATH:/usr/local/sencha
 
@@ -35,7 +35,11 @@ RUN \
   mkdir /usr/local/sencha/repo && \
   chmod 777 /usr/local/sencha/repo && \
   ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
-  rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh
+  rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
+  curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
+  tar xvzf helm.tar.gz && \
+  mv linux-amd64/helm /usr/local/bin && \
+  rm -rf helm.tar.gz linux-amd
 
 #################################################
 # ----------------Chrome-------------------------
