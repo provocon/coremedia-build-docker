@@ -36,22 +36,13 @@ Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-10-2107.
+The latest Tag works with - at least again - CMCC-11-2110.
 
 ## Build
 
 ### Manual Build
 
-To be able to support `docker in docker` creation of containers, we had to
-prepare a new base-container with [Alpine Linux][alpine], JDK11, and
-[Maven 3.8][maven]:
-
-```
-docker build -f Dockerfile.alpine-docker-jdk11-maven3.8 -t provocon/alpine-docker-jdk11-maven3.8:latest .
-docker push provocon/alpine-docker-jdk11-maven3.8:latest
-```
-
-The further preparation of the container is accomplished using the usual
+The preparation of the container is accomplished using the usual
 
 ```
 docker build -t <myname> .
@@ -60,13 +51,13 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:2110.1 .
+docker build -t provocon/coremedia-build:2110.2 .
 docker build -t provocon/coremedia-build:2110 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2110.1
+docker push provocon/coremedia-build:2110.2
 docker push provocon/coremedia-build:2110
 docker push provocon/coremedia-build:latest
 ```
@@ -90,23 +81,24 @@ Test the generated resulting container with
 
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
-Client: Docker Engine - Community
- Version:           19.03.4
- API version:       1.40
- Go version:        go1.12.10
- Git commit:        9013bf583a
- Built:             Fri Oct 18 15:49:05 2019
+Client:
+ Version:           20.10.12
+ API version:       1.41
+ Go version:        go1.16.12
+ Git commit:        e91ed57
+ Built:             Mon Dec 13 11:40:57 2021
  OS/Arch:           linux/amd64
- Experimental:      false
+ Context:           default
+ Experimental:      true
 ```
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.8.3 (d66c9c0b3152b2e69ee9bac180bb8fcc8e6af555; 2019-04-04T19:00:29Z)
+Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
 Maven home: /usr/share/maven
-Java version: 11, vendor: Oracle Corporation, runtime: /opt/java/openjdk
+Java version: 11.0.14, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "4.4.0-166-generic", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.10.0-9-amd64", arch: "amd64", family: "unix"
 ```
 
 ```

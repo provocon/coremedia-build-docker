@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2021 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +13,94 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM provocon/alpine-docker-jdk11-maven3.8:latest
+# https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
+FROM docker:20.10
 
+# Maven
 # Helm to support using charts from within your build:
-ARG HELM_VERSION=3.7.2
 # SenchaCmd:
-ARG SENCHA_VERSION=7.2.0.84
-ENV PATH $PATH:/usr/local/sencha
+ARG MAVEN_VERSION=3.8.4 \
+    MAVEN_SHA=a9b2d825eacf2e771ed5d6b0e01398589ac1bfa4171f36154d1b5787879605507802f699da6f7cfc80732a5282fd31b28e4cd6052338cbef0fa1358b48a5e3c8 \
+    USER_HOME_DIR="/root"
+ARG MAVEN_BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries \
+    HELM_VERSION=3.7.2 \
+    SENCHA_VERSION=7.2.0.84 \
+    MAINTAINER='PROVOCON https://github.com/provocon/'
+
+LABEL maintainer="${MAINTAINER}"
+
+# Inspired by https://github.com/timbru31/docker-alpine-java-maven/blob/master/Dockerfile
+ARG REFRESHED_AT
+ENV REFRESHED_AT $REFRESHED_AT
+
+# Maven package depends on openjdk8-jre, so a manual installation is necessary
+# https://github.com/Docker-Hub-frolvlad/docker-alpine-glibc/blob/master/Dockerfile
+RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+    ALPINE_GLIBC_PACKAGE_VERSION="2.34-r0" && \
+    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
+    echo \
+        "-----BEGIN PUBLIC KEY-----\
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApZ2u1KJKUu/fW4A25y9m\
+        y70AGEa/J3Wi5ibNVGNn1gT1r0VfgeWd0pUybS4UmcHdiNzxJPgoWQhV2SSW1JYu\
+        tOqKZF5QSN6X937PTUpNBjUvLtTQ1ve1fp39uf/lEXPpFpOPL88LKnDBgbh7wkCp\
+        m2KzLVGChf83MS0ShL6G9EQIAUxLm99VpgRjwqTQ/KfzGtpke1wqws4au0Ab4qPY\
+        KXvMLSPLUp7cfulWvhmZSegr5AdhNw5KNizPqCJT8ZrGvgHypXyiFvvAH5YRtSsc\
+        Zvo9GI2e2MaZyo9/lvb+LbLEJZKEQckqRj4P26gmASrZEPStwc+yqy1ShHLA0j6m\
+        1QIDAQAB\
+        -----END PUBLIC KEY-----" | sed 's/   */\n/g' > "/etc/apk/keys/sgerrand.rsa.pub" && \
+    wget -q \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    apk del libc6-compat && \
+    apk add --no-cache \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    rm "/etc/apk/keys/sgerrand.rsa.pub" && \
+    (/usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 "$LANG" || true) && \
+    echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
+    apk del glibc-i18n && \
+    rm "/root/.wget-hsts" && \
+    apk del --purge .build-dependencies && \
+    rm \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+  wget -qO /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
+  echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
+  apk update && \
+  apk upgrade && \
+  apk add curl amazon-corretto-11 && \
+  mkdir -p /usr/share/maven /usr/share/maven/ref  && \
+  curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
+  echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - && \
+  tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 && \
+  ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
+  rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
+
+# Default configuration
+ENV MAVEN_HOME /usr/share/maven \
+    MAVEN_CONFIG "$USER_HOME_DIR/.m2" \
+    JAVA_VERSION 11.0.14.9.1-r0 \
+    JAVA_HOME=/usr/lib/jvm/default-jvm \
+    PATH="/usr/lib/jvm/default-jvm/bin:$PATH:/usr/local/sencha" \
+    LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8' \
+    DISPLAY :20.0 \
+    SCREEN_GEOMETRY "1440x900x24" \
+    CHROMEDRIVER_PORT 4444 \
+    CHROMEDRIVER_WHITELISTED_IPS "127.0.0.1" \
+    CHROMEDRIVER_URL_BASE '' \
+    CHROMEDRIVER_EXTRA_ARGS '' \
+    CHROME_BIN=/usr/bin/chromium-browser
 
 # The tools xz, zip, openssh etc are helpers for common .gitlab-ci usages
 RUN \
-  apk update && \
-  apk upgrade && \
   apk add xz zip p7zip parallel sudo git bash openssh-client && \
-  apk add font-noto && \
+  apk add font-noto gnupg && \
   fc-cache -fv && \
   curl -o /usr/local/sencha.zip http://cdn.sencha.com/cmd/${SENCHA_VERSION}/no-jre/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh.zip 2> /dev/null && \
   cd /usr/local && \
@@ -36,6 +110,9 @@ RUN \
   chmod 777 /usr/local/sencha/repo && \
   ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
   rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
+  apk add nodejs npm && \
+  npm install -g pnpm && \
+  pnpm install -g pnpm && \
   curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
   tar xvzf helm.tar.gz && \
   mv linux-amd64/helm /usr/local/bin && \
@@ -45,20 +122,11 @@ RUN \
 # ----------------Chrome-------------------------
 #################################################
 # Taken from https://stackoverflow.com/a/48295423
-ENV CHROME_BIN=/usr/bin/chromium-browser
 RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
     echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
     apk add --no-cache \
       chromium chromium-chromedriver \
       nss@edge
-
-# Default configuration
-ENV DISPLAY :20.0
-ENV SCREEN_GEOMETRY "1440x900x24"
-ENV CHROMEDRIVER_PORT 4444
-ENV CHROMEDRIVER_WHITELISTED_IPS "127.0.0.1"
-ENV CHROMEDRIVER_URL_BASE ''
-ENV CHROMEDRIVER_EXTRA_ARGS ''
 
 EXPOSE 4444
 
