@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2021 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ variables:
   # DOCKER_TLS_CERTDIR: ""
   # DOCKER_HOST: tcp://docker:2375
 
-# Generate and store deployment archives as docker containers
+# Generate and store srtifacts for later packaging
 Build:
   stage: create
   # Cache downloaded dependencies and plugins between builds.
@@ -61,7 +61,7 @@ Build:
       - $CI_PROJECT_DIR/repository
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
-    - docker:19.03.1-dind
+    - docker:20.10-dind
   script:
     # Pre-fill docker images to use locally with authenticated requests:
     # - echo "Login in as _${DH_REGISTRY_USER}_"
@@ -122,7 +122,7 @@ Push:
       - $CI_PROJECT_DIR/repository
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
-    - docker:19.03.1-dind
+    - docker:20.10-dind
   script:
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -146,6 +146,18 @@ Push:
     # Pre-fill docker images to use locally with authenticated requests:
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
     - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
+    #
+    # studio client has to be build separately
+    - cd apps/studio-client
+    - cp $CI_PROJECT_DIR/workspace-configuration/npmrc .npmrc
+    - pnpm install
+    - pnpm -r run build
+    - pnpm -r run package --filter @coremedia-blueprint/studio-client.studio
+    - export TOOLING="provocon/studio-client-tooling:latest"
+    - export DOCKER_BUILDKIT=1
+    - export CI=true
+    - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING"
+    - cd ../..
     # Re-run maven with a pre-filled cache and now add image generation
     # only in the needed submodules to avoid full re-build
     - |
