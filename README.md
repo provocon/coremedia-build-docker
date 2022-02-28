@@ -2,10 +2,10 @@
 
 This repository contains the necessary parts to create a Docker container with
 the few required tools to build [CoreMedia][coremedia] Plattforms starting from
-17nmthroughout 21nm as used in CoreMedia Content Cloud 11, CoreMedia Content
+17nm throughout 22nm as used in CoreMedia Content Cloud 11, CoreMedia Content
 Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
 
-The home of this repository is at [github][github] with an automated mirror at
+The home of this repository is at [github][github] with a mirror at
 [gitlab][gitlab].
 
 ## Feedback
@@ -16,11 +16,11 @@ for feedback.
 ## Goals
 
 This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI. An example starting point is included with this 
+[GitLab][gitlabci] CI. An example starting points are included with this 
 repository.
 
-See example directory with a usage example and mind the essential parameters
-when building CoreMedia Content Cloud with [Maven][maven]:
+See the `example/` directory with usage examples and mind the essential 
+parameters and [Maven][maven] setup when building CoreMedia Content Cloud, e.g.
 
 ```
 mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
@@ -36,7 +36,7 @@ Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-11-2110.
+The latest Tag works with - at least again - CMCC-11-2201.
 
 ## Build
 
