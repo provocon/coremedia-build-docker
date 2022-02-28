@@ -14,13 +14,13 @@
 # limitations under the License.
 #
 on:
-  schedule:
-    - cron: '31 23 * * *'
   push:
     branches: [ master ]
     tags: [ '*' ]
   pull_request:
     branches: [ master ]
+#  schedule:
+#    - cron: '31 23 * * *'
 
 env:
   REGISTRY: ghcr.io
