@@ -17,6 +17,7 @@
 # to build a separate deployment script archive and maven artifact archive.
 #
 # Relies on the following variables to be set for maven config:
+#   MAVEN_OPTS
 #
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
