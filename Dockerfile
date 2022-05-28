@@ -87,7 +87,8 @@ ENV MAVEN_HOME /usr/share/maven \
     MAVEN_CONFIG "$USER_HOME_DIR/.m2" \
     JAVA_VERSION 11.0.14.9.1-r0 \
     JAVA_HOME=/usr/lib/jvm/default-jvm \
-    PATH="/usr/lib/jvm/default-jvm/bin:$PATH:/usr/local/sencha" \
+    PNPM_HOME=/usr/local/bin \
+    PATH="$JAVA_HOME/bin:$PATH:/usr/local/sencha" \
     LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8' \
     DISPLAY :20.0 \
     SCREEN_GEOMETRY "1440x900x24" \
@@ -99,8 +100,7 @@ ENV MAVEN_HOME /usr/share/maven \
 
 # The tools xz, zip, openssh etc are helpers for common .gitlab-ci usages
 RUN \
-  apk add xz zip p7zip parallel sudo git bash openssh-client && \
-  apk add font-noto gnupg && \
+  apk add xz zip p7zip parallel sudo git bash openssh-client font-noto gnupg && \
   fc-cache -fv && \
   curl -o /usr/local/sencha.zip http://cdn.sencha.com/cmd/${SENCHA_VERSION}/no-jre/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh.zip 2> /dev/null && \
   cd /usr/local && \
@@ -112,6 +112,7 @@ RUN \
   rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
   apk add nodejs npm && \
   npm install -g pnpm && \
+  export PNPM_HOME=/usr/local/bin && \
   pnpm install -g pnpm && \
   curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
   tar xvzf helm.tar.gz && \

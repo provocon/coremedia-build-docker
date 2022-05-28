@@ -36,7 +36,7 @@ Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-11-2201.
+The latest Tag works with - at least again - CMCC-11-2204.
 
 ## Build
 
@@ -72,7 +72,7 @@ Alternatively you could use the [Gradle Build Tool][gradle] and issue
 ./gradlew -PbuildTag=latest dockerPush
 ```
 
-which does all the steps above for you except building the base-container.
+which does all the steps above for you.
 
 
 ## Test
@@ -94,11 +94,11 @@ Client:
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
+Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
 Maven home: /usr/share/maven
-Java version: 11.0.14, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
-Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-9-amd64", arch: "amd64", family: "unix"
+Java version: 11.0.15, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "5.10.0-13-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
