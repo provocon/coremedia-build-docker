@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 plugins {
-  id 'com.palantir.docker' version '0.32.0' // https://github.com/palantir/gradle-docker
+  id 'com.palantir.docker' version '0.33.0' // https://github.com/palantir/gradle-docker
 }
 
 apply plugin: 'java-base'

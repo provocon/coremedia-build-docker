@@ -60,13 +60,13 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:2110.2 .
+docker build -t provocon/coremedia-build:2110.3 .
 docker build -t provocon/coremedia-build:2110 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2110.2
+docker push provocon/coremedia-build:2110.3
 docker push provocon/coremedia-build:2110
 docker push provocon/coremedia-build:latest
 ```
@@ -76,7 +76,7 @@ docker push provocon/coremedia-build:latest
 Alternatively you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -PbuildTag=2110.1 dockerPush
+./gradlew -PbuildTag=2110.3 dockerPush
 ./gradlew -PbuildTag=2110   dockerPush
 ./gradlew -PbuildTag=latest dockerPush
 ```
@@ -119,7 +119,7 @@ Sencha Cmd v7.2.0.84
 To call the container image use
 
 ```
-docker run -it provocon/coremedia-build
+docker run -it provocon/coremedia-build /bin/bash
 ```
 
 [sencha]: https://www.sencha.com/products/extjs/cmd-download/
