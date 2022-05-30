@@ -16,7 +16,7 @@ for feedback.
 ## Goals
 
 This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI. An example starting points are included with this 
+[GitLab][gitlabci] CI. Example starting points are included with this
 repository.
 
 See the `example/` directory with usage examples and mind the essential 
@@ -25,6 +25,15 @@ parameters and [Maven][maven] setup when building CoreMedia Content Cloud, e.g.
 ```
 mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
 ```
+
+Also some common tools for additional preparation steps are included like
+
+* `git`
+* `gnupg`
+* `cosign`
+* `openssh`
+
+and some compression tools.
 
 ## Availability
 

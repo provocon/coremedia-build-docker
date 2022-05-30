@@ -98,7 +98,7 @@ ENV MAVEN_HOME /usr/share/maven \
     CHROMEDRIVER_EXTRA_ARGS '' \
     CHROME_BIN=/usr/bin/chromium-browser
 
-# The tools xz, zip, openssh etc are helpers for common .gitlab-ci usages
+# The tools cosign, xz, zip, openssh etc are helpers for common CI usages
 RUN \
   apk add xz zip p7zip parallel sudo git bash openssh-client font-noto gnupg && \
   fc-cache -fv && \
@@ -119,15 +119,16 @@ RUN \
   mv linux-amd64/helm /usr/local/bin && \
   rm -rf helm.tar.gz linux-amd
 
-#################################################
-# ----------------Chrome-------------------------
-#################################################
-# Taken from https://stackoverflow.com/a/48295423
+# Chromium: Taken from https://stackoverflow.com/a/48295423
 RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
     echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
     apk add --no-cache \
       chromium chromium-chromedriver \
       nss@edge
+
+# Cosign images signing option
+RUN \
+  apk add cosign@edge
 
 EXPOSE 4444
 
