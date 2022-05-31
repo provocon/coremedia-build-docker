@@ -154,7 +154,7 @@ Push:
     - pnpm install
     - pnpm -r run build
     - pnpm -r run package --filter @coremedia-blueprint/studio-client.studio
-    - export TOOLING="provocon/studio-client-tooling:latest"
+    - export TOOLING="provocon/coremedia-build:latest"
     - export DOCKER_BUILDKIT=1
     - export CI=true
     - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING"
