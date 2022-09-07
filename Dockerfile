@@ -19,8 +19,8 @@ FROM docker:20.10
 # Maven
 # Helm to support using charts from within your build:
 # SenchaCmd:
-ARG MAVEN_VERSION=3.8.5 \
-    MAVEN_SHA=89ab8ece99292476447ef6a6800d9842bbb60787b9b8a45c103aa61d2f205a971d8c3ddfb8b03e514455b4173602bd015e82958c0b3ddc1728a57126f773c743 \
+ARG MAVEN_VERSION=3.8.6 \
+    MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26 \
     USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries \
     HELM_VERSION=3.7.2 \
@@ -70,17 +70,17 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
         "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
-  wget -qO /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
-  echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
-  apk update && \
-  apk upgrade && \
-  apk add -q curl amazon-corretto-11 && \
-  mkdir -p /usr/share/maven /usr/share/maven/ref  && \
-  curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-  echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - && \
-  tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 && \
-  ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
-  rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
+    wget -qO /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
+    echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
+    apk update && \
+    apk upgrade && \
+    apk add -q curl amazon-corretto-11 && \
+    mkdir -p /usr/share/maven /usr/share/maven/ref  && \
+    curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
+    echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - && \
+    tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 && \
+    ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
+    rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
 
 # Default configuration
 LABEL PNPM_VERSION="6.29.1"
