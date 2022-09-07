@@ -49,11 +49,6 @@ build:
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
     - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
-  artifacts:
-    paths:
-    - build/*.ci
-    expire_in: 5 days
-    name: ${CI_BUILD_STAGE}
 
 release:
   stage: image
@@ -69,7 +64,3 @@ release:
     - docker push "${IMAGE_NAME}:$SHORT_TAG"
     - docker push "${IMAGE_NAME}:latest"
     - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
-  artifacts:
-    paths:
-    - build/*.ci
-    name: ${CI_BUILD_STAGE}
