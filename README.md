@@ -60,13 +60,13 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:2110.3 .
+docker build -t provocon/coremedia-build:2110.4 .
 docker build -t provocon/coremedia-build:2110 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2110.3
+docker push provocon/coremedia-build:2110.4
 docker push provocon/coremedia-build:2110
 docker push provocon/coremedia-build:latest
 ```
@@ -76,7 +76,7 @@ docker push provocon/coremedia-build:latest
 Alternatively you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -PbuildTag=2110.3 dockerPush
+./gradlew -PbuildTag=2110.4 dockerPush
 ./gradlew -PbuildTag=2110   dockerPush
 ./gradlew -PbuildTag=latest dockerPush
 ```
