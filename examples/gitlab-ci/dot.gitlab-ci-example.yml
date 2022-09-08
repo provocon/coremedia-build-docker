@@ -22,9 +22,6 @@
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
-# Additional Maven Artifacts Repository User and Password:
-#   ADD_MAVEN_USER
-#   ADD_MAVEN_PASSWORD
 #
 image: provocon/coremedia-build:latest
 
@@ -108,7 +105,7 @@ Build:
       -Dwebdriver.chrome.verboseLogging=true \
       -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
       -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-      -DfailIfNoTests=false
+      -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
     #
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
@@ -130,6 +127,10 @@ Push:
     # Cache check - must not be empty
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    # To support reproducable builds, CoreMedia uses a dummy date.
+    # We replace this by the commit date, which should also remain constant.
+    - BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
+    - find -name pom.xml -exec sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
     # release and provider tagging - some tweaks to handle branch and tag name patterns
     # Branch names starting with cmcc- are considered work in progress and packages thus
     # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
@@ -159,6 +160,7 @@ Push:
     - export CI=true
     - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING"
     - cd ../..
+    #
     # Re-run maven with a pre-filled cache and now add image generation
     # only in the needed submodules to avoid full re-build
     - |
@@ -173,7 +175,6 @@ Push:
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
         -DfailIfNoTests=false -f $PART
       done
-    #
     - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}} {{.Size}}"
     # select images to tag and push
     - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)

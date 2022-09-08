@@ -19,12 +19,12 @@ This container is intended for use in container based CI system like the
 [GitLab][gitlabci] CI. Example starting points are included with this
 repository.
 
-See the `example/` directory with usage examples and mind the essential 
-parameters and [Maven][maven] setup when building CoreMedia Content Cloud, e.g.
+See the `examples/` directory with usage examples and don't forget the
+[Maven][maven] and [NPM][npm] registry setup.
 
-```
-mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
-```
+Examples for builds with [GitLab][gitlabci] CI and [github][github] Actions
+will need the additional files in `examples/workspace-configuration` and
+a personal `npmrc` needs to be created through `npm-registry-login.sh`.
 
 Also some common tools for additional preparation steps are included like
 
@@ -34,6 +34,13 @@ Also some common tools for additional preparation steps are included like
 * `openssh`
 
 and some compression tools.
+
+Perhaps you still need to mind some parameters when building CoreMedia Content
+Cloud, e.g.
+
+```
+mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+```
 
 ## Availability
 
@@ -45,7 +52,7 @@ Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-11-2204.
+The latest Tag works with - at least again - CMCC-11-2207.
 
 ## Build
 
@@ -91,11 +98,11 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           20.10.12
+ Version:           20.10.17
  API version:       1.41
- Go version:        go1.16.12
- Git commit:        e91ed57
- Built:             Mon Dec 13 11:40:57 2021
+ Go version:        go1.17.11
+ Git commit:        100c701
+ Built:             Mon Jun  6 22:56:42 2022
  OS/Arch:           linux/amd64
  Context:           default
  Experimental:      true
@@ -103,11 +110,11 @@ Client:
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
+Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
 Maven home: /usr/share/maven
-Java version: 11.0.15, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
+Java version: 11.0.16.1, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-13-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.10.0-9-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
@@ -128,6 +135,6 @@ docker run -it provocon/coremedia-build /bin/bash
 [issues]: https://github.com/provocon/coremedia-build-docker/issues
 [github]: https://github.com/provocon/coremedia-build-docker
 [gitlab]: https://gitlab.com/provocon/coremedia-build-docker
-[alpine]: https://www.alpinelinux.org/
 [maven]: https://maven.apache.org/
 [gradle]: https://gradle.org/
+[npm]: https://www.npmjs.com/

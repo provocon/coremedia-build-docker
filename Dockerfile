@@ -25,6 +25,7 @@ ARG MAVEN_VERSION=3.8.6 \
 ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries \
     HELM_VERSION=3.7.2 \
     SENCHA_VERSION=7.2.0.84 \
+    PNPM_VERSION=7.1.5 \
     MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="${MAINTAINER}"
@@ -83,7 +84,7 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
 
 # Default configuration
-LABEL PNPM_VERSION="6.29.1"
+LABEL PNPM_VERSION="${PNPM_VERSION}"
 ENV MAVEN_HOME /usr/share/maven \
     MAVEN_CONFIG "$USER_HOME_DIR/.m2" \
     JAVA_VERSION 11.0.14.9.1-r0 \
@@ -112,9 +113,9 @@ RUN \
   ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
   rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
   apk add -q nodejs npm && \
-  npm install -g pnpm@6.29.1 && \
+  npm install -g pnpm@${PNPM_VERSION} && \
   export PNPM_HOME=/usr/local/bin && \
-  pnpm install -g pnpm@6.29.1 && \
+  pnpm install -g pnpm@${PNPM_VERSION} && \
   curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
   tar xvzf helm.tar.gz && \
   mv linux-amd64/helm /usr/local/bin && \

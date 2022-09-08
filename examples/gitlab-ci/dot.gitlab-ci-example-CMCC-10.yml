@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2021 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,9 +27,6 @@
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
-# Additional Maven Artifacts Repository User and Password:
-#   ADD_MAVEN_USER
-#   ADD_MAVEN_PASSWORD
 #
 image: provocon/coremedia-build:latest
 
