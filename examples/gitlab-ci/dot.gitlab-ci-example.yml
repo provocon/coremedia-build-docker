@@ -154,7 +154,7 @@ Push:
     - cp $CI_PROJECT_DIR/workspace-configuration/npmrc .npmrc
     - pnpm install
     - pnpm -r run build
-    - pnpm -r run package --filter @coremedia-blueprint/studio-client.studio
+    - pnpm -r --filter @coremedia-blueprint/studio-client.studio run package
     - export TOOLING="provocon/coremedia-build:latest"
     - export DOCKER_BUILDKIT=1
     - export CI=true
@@ -173,7 +173,7 @@ Push:
         -Dwebdriver.chrome.verboseLogging=true \
         -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false -f $PART
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false -f $PART
       done
     - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}} {{.Size}}"
     # select images to tag and push
