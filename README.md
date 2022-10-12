@@ -5,24 +5,24 @@ the few required tools to build [CoreMedia][coremedia] Plattforms starting from
 17nm throughout 22nm as used in CoreMedia Content Cloud 11, CoreMedia Content
 Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
 
-The home of this repository is at [github][github] with a mirror at
-[gitlab][gitlab].
+The home of this repository is at [GitHub][github] with a mirror at
+[GitLab][gitlab].
 
 ## Feedback
 
-Please use the [issues][issues] section of this repository at [github][github] 
+Please use the [issues][issues] section of this repository at [GitHub][github]
 for feedback. 
 
 ## Goals
 
 This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI. Example starting points are included with this
-repository.
+[GitLab][gitlabci] CI or [GitHub][github] Actions. Example starting points are
+included with this repository.
 
 See the `examples/` directory with usage examples and don't forget the
 [Maven][maven] and [NPM][npm] registry setup.
 
-Examples for builds with [GitLab][gitlabci] CI and [github][github] Actions
+Examples for builds with [GitLab][gitlabci] CI and [GitHub][github] Actions
 will need the additional files in `examples/workspace-configuration` and
 a personal `npmrc` needs to be created through `npm-registry-login.sh`.
 
@@ -67,14 +67,14 @@ docker build -t <myname> .
 So, for the current version this is
 
 ```
-docker build -t provocon/coremedia-build:2110.4 .
-docker build -t provocon/coremedia-build:2110 .
+docker build -t provocon/coremedia-build:2207.1 .
+docker build -t provocon/coremedia-build:2207 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2110.4
-docker push provocon/coremedia-build:2110
+docker push provocon/coremedia-build:2207.1
+docker push provocon/coremedia-build:2207
 docker push provocon/coremedia-build:latest
 ```
 
@@ -83,8 +83,8 @@ docker push provocon/coremedia-build:latest
 Alternatively you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -PbuildTag=2110.4 dockerPush
-./gradlew -PbuildTag=2110   dockerPush
+./gradlew -PbuildTag=2207.1 dockerPush
+./gradlew -PbuildTag=2207   dockerPush
 ./gradlew -PbuildTag=latest dockerPush
 ```
 
@@ -98,11 +98,11 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           20.10.17
+ Version:           20.10.18
  API version:       1.41
- Go version:        go1.17.11
- Git commit:        100c701
- Built:             Mon Jun  6 22:56:42 2022
+ Go version:        go1.18.6
+ Git commit:        b40c2f6
+ Built:             Thu Sep  8 23:05:51 2022
  OS/Arch:           linux/amd64
  Context:           default
  Experimental:      true
@@ -114,13 +114,13 @@ Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
 Maven home: /usr/share/maven
 Java version: 11.0.16.1, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
 Default locale: en_US, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-9-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.10.0-18-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
 $ docker run --name sencha --rm -it --entrypoint=sencha provocon/coremedia-build which
-Sencha Cmd v7.2.0.84
-/usr/local/sencha/7.2.0.84/
+Sencha Cmd v7.6.0.87
+/usr/local/sencha/7.6.0.87/
 ```
 
 To call the container image use

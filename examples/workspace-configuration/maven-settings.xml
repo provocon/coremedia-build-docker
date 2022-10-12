@@ -1,9 +1,9 @@
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-          
-  <!-- Maven Settings used for GitLab based builds -->
-    
+
+  <!-- Maven Settings used for GitHub and GitLab based builds -->
+
   <localRepository>${env.CI_PROJECT_DIR}/repository</localRepository>
 
   <pluginGroups>

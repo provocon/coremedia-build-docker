@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # Example starting point for a GitLab build file for CoreMedia CMCC workspaces
-# to build a separate deployment script archive and maven artifact archive.
 #
 # Relies on the following variables to be set for maven config:
 #   MAVEN_OPTS
@@ -28,7 +27,7 @@
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
 #
-image: provocon/coremedia-build:latest
+image: provocon/coremedia-build:2110.3
 
 # Because $envName-Deployments are manual jobs, they could be executed without
 # a prior build because in almost any cases docker container were present and
