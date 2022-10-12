@@ -13,16 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-name: Build and Push CMCC
+# Example starting point for a GitHub build file for CoreMedia CMCC workspaces
+#
+# Relies on the following action secrets to be set:
+#   CM_MAVEN_USER
+#   CM_MAVEN_PASSWORD
+#   NPMRC
+#
+name: Build CMCC
 
 on:
   push:
-    branches: [ cmcc-11-actions ]
-  pull_request:
     branches: [ master ]
 
 jobs:
-  build:
+  images:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,23 +37,24 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Cache local Maven repository
-      uses: actions/cache@v2
+    - name: Cache local repositories
+      uses: actions/cache@v3
       with:
         path: ~/repository
         key: cmcc11
         restore-keys: cmcc11
     - name: Configure Workspace
-      run: mkdir -p ~/.m2 && cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
-    - name: Derive Build Date
       run: |
+        mkdir -p ~/.m2 && cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+        mkdir -p ~/repository
+        repoJars=$(find ~/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
+    - name: Prepare Version Information
+      run: |
+        sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
         BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
         find -name pom.xml -exec \
           sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
-    - name: Prepare Version Tags
-      run: |
-        sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
-        VERSION_AFTER=$(echo "${CI_COMMIT_REF_NAME}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
+        VERSION_AFTER=$(echo "${{ github.ref_name }}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
         VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
         VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
         echo "$BUILD_DATE: $VERSION_BEFORE -> $VERSION_AFTER"
@@ -61,6 +67,7 @@ jobs:
         CM_MAVEN_USER: ${{ secrets.CM_MAVEN_USER }}
         CM_MAVEN_PASSWORD: ${{ secrets.CM_MAVEN_PASSWORD }}
       run: |
+        export CI_PROJECT_DIR=~
         mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
         -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
@@ -68,4 +75,29 @@ jobs:
         -Dwebdriver.chrome.verboseLogging=true \
         -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
+        docker images
+
+  studio:
+    runs-on: ubuntu-latest
+    container:
+      image: provocon/coremedia-build:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache local repositories
+      uses: actions/cache@v3
+      with:
+        path: .pnpm-store
+        key: cmcc11-studio-client
+        restore-keys: cmcc11-studio-client
+    - name: Build Studio Client
+      run: |
+        cd apps/studio-client
+        echo "${{ secrets.NPMRC }}" > .npmrc
+        export TOOLING="provocon/coremedia-build:latest"
+        export DOCKER_BUILDKIT=1
+        export CI=true
+        docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING" --build-arg=SKIP_GENERATE_LOCK_FILE=false
+        rm -rf node_modules
+        docker images
+        cd ../..
