@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # Example starting point for a GitLab build file for CoreMedia CMCC workspaces
-# to build a separate deployment script archive and maven artifact archive.
 #
 # Relies on the following variables to be set for maven config:
 #   MAVEN_OPTS
@@ -22,6 +21,9 @@
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
+#
+# CoreMedia NPM Registry Token
+#   NPMRC_TOKEN
 #
 image: provocon/coremedia-build:latest
 
@@ -55,8 +57,9 @@ Build:
   cache:
     key: "cmcc-11"
     paths:
-      - .remote-packages/
-      - $CI_PROJECT_DIR/repository
+      - .pnpm-store
+      - repository
+      - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
     - docker:20.10-dind
@@ -64,7 +67,7 @@ Build:
     # Pre-fill docker images to use locally with authenticated requests:
     # - echo "Login in as _${DH_REGISTRY_USER}_"
     # - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    # - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
+    # - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
     # Cache preparation and check
@@ -116,8 +119,9 @@ Push:
   cache:
     key: "cmcc-11"
     paths:
-      - .remote-packages/
-      - $CI_PROJECT_DIR/repository
+      - .pnpm-store
+      - repository
+      - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
     - docker:20.10-dind
@@ -147,18 +151,18 @@ Push:
       fi
     # Pre-fill docker images to use locally with authenticated requests:
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
+    - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     #
     # studio client has to be build separately
     - cd apps/studio-client
-    - cp $CI_PROJECT_DIR/workspace-configuration/npmrc .npmrc
-    - pnpm install
-    - pnpm -r run build
-    - pnpm -r --filter @coremedia-blueprint/studio-client.studio run package
+    - echo "@coremedia:registry=https://npm.coremedia.io" > .npmrc
+    - echo "@jangaroo:registry=https://npm.coremedia.io" >> .npmrc
+    - echo "//npm.coremedia.io/:_authToken=$NPMRC_TOKEN" >> .npmrc
+    - echo "unsafe-perm=true" >> .npmrc
     - export TOOLING="provocon/coremedia-build:latest"
     - export DOCKER_BUILDKIT=1
     - export CI=true
-    - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING"
+    - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING" --build-arg=SKIP_GENERATE_LOCK_FILE=false
     - cd ../..
     #
     # Re-run maven with a pre-filled cache and now add image generation
