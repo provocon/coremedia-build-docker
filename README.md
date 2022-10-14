@@ -1,30 +1,25 @@
 # CoreMedia Build Container
 
-This repository contains the necessary parts to create a Docker container with
-the few required tools to build [CoreMedia][coremedia] Plattforms starting from
-17nm throughout 22nm as used in CoreMedia Content Cloud 11, CoreMedia Content
-Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
+This repository contains the necessary parts to create a Docker image with the
+few required tools to build [CoreMedia][coremedia] Plattforms starting from
+17nm up to 22nm as used in CoreMedia Content Cloud 11, CoreMedia Content Cloud
+10, CMS-9, and CoreMedia Live Context 3 workspaces.
 
 The home of this repository is at [GitHub][github] with a mirror at
 [GitLab][gitlab].
+
 
 ## Feedback
 
 Please use the [issues][issues] section of this repository at [GitHub][github]
 for feedback. 
 
+
 ## Goals
 
 This container is intended for use in container based CI system like the
-[GitLab][gitlabci] CI or [GitHub][github] Actions. Example starting points are
+[GitLab][gitlabci] CI or [GitHub][actions] Actions. Example starting points are
 included with this repository.
-
-See the `examples/` directory with usage examples and don't forget the
-[Maven][maven] and [NPM][npm] registry setup.
-
-Examples for builds with [GitLab][gitlabci] CI and [GitHub][github] Actions
-will need the additional files in `examples/workspace-configuration` and
-a personal `npmrc` needs to be created through `npm-registry-login.sh`.
 
 Also some common tools for additional preparation steps are included like
 
@@ -35,12 +30,6 @@ Also some common tools for additional preparation steps are included like
 
 and some compression tools.
 
-Perhaps you still need to mind some parameters when building CoreMedia Content
-Cloud, e.g.
-
-```
-mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
-```
 
 ## Availability
 
@@ -53,6 +42,54 @@ required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
 The latest Tag works with - at least again - CMCC-11-2207.
+
+
+## Usage
+
+See the `examples/` directory with usage examples and don't forget the
+[Maven][maven] and [NPM][npm] registry setup.
+
+Examples for builds with [GitLab CI][gitlabci] and [GitHub Actions][actions]
+will need the additional files in `examples/workspace-configuration` and
+a personal `npmrc` needs to be created through `npm-registry-login.sh`.
+
+Perhaps you still need to mind some parameters when building CoreMedia Content
+Cloud, e.g.
+
+```
+mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
+```
+
+So, with [GitLab CI][gitlabci] and [GitHub Actions][actions] the steps are
+
+### Adding files
+
+* `workspace-configuration/maven-settings.xml`
+* `.gitlab-ci.yml`
+
+### Adding secrets
+
+These values habe to be added as CI variables for GitLab or action secrets for
+GitHub respectively.
+
+CoreMedia Maven Artifacts Repository User and Password:
+
+* CM_MAVEN_USER
+* CM_MAVEN_PASSWORD
+
+CoreMedia NPM Registry Token:
+
+* NPMRC_TOKEN
+
+Optionally add Maven Options
+
+* MAVEN_OPTS
+
+and use Docker Hub login to extend the download rate.
+
+* DH_REGISTRY_USER
+* DH_REGISTRY_PASSWORD
+
 
 ## Build
 
@@ -131,10 +168,12 @@ docker run -it provocon/coremedia-build /bin/bash
 
 [sencha]: https://www.sencha.com/products/extjs/cmd-download/
 [coremedia]: http://www.coremedia.com/
-[gitlabci]: https://gitlab.com/
-[issues]: https://github.com/provocon/coremedia-build-docker/issues
-[github]: https://github.com/provocon/coremedia-build-docker
-[gitlab]: https://gitlab.com/provocon/coremedia-build-docker
 [maven]: https://maven.apache.org/
 [gradle]: https://gradle.org/
 [npm]: https://www.npmjs.com/
+[gitlabci]: https://docs.gitlab.com/ee/ci/
+[actions]: https://github.com/features/actions
+[dockerhub]: https://hub.docker.com/
+[issues]: https://github.com/provocon/coremedia-build-docker/issues
+[github]: https://github.com/provocon/coremedia-build-docker
+[gitlab]: https://gitlab.com/provocon/coremedia-build-docker
