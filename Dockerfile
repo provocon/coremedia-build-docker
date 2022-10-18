@@ -31,10 +31,7 @@ ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binar
 LABEL maintainer="${MAINTAINER}"
 LABEL PNPM_VERSION="${PNPM_VERSION}"
 
-# Inspired by https://github.com/timbru31/docker-alpine-java-maven/blob/master/Dockerfile
-ARG REFRESHED_AT
-ENV REFRESHED_AT $REFRESHED_AT \
-    MAVEN_HOME /usr/share/maven \
+ENV MAVEN_HOME /usr/share/maven \
     MAVEN_CONFIG "$USER_HOME_DIR/.m2" \
     JAVA_HOME=/usr/lib/jvm/default-jvm \
     PNPM_HOME=/usr/local/bin \
