@@ -159,10 +159,11 @@ Push:
     - echo "@jangaroo:registry=https://npm.coremedia.io" >> .npmrc
     - echo "//npm.coremedia.io/:_authToken=$NPMRC_TOKEN" >> .npmrc
     - echo "unsafe-perm=true" >> .npmrc
-    - export TOOLING="provocon/coremedia-build:latest"
-    - export DOCKER_BUILDKIT=1
-    - export CI=true
-    - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING" --build-arg=SKIP_GENERATE_LOCK_FILE=false
+    - CI=true
+    - pnpm install
+    - pnpm -r build
+    - pnpm -r package
+    - DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
     - cd ../..
     #
     # Re-run maven with a pre-filled cache and now add image generation
