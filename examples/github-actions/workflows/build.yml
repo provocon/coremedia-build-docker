@@ -91,8 +91,8 @@ jobs:
         key: cmcc11-studio-client
         restore-keys: cmcc11-studio-client
     - name: Build Studio Client
+      working-directory: apps/studio-client
       run: |
-        cd apps/studio-client
         echo "${{ secrets.NPMRC }}" > .npmrc
         export TOOLING="provocon/coremedia-build:latest"
         export DOCKER_BUILDKIT=1
