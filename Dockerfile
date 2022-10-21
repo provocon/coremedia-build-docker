@@ -19,14 +19,14 @@ FROM docker:20.10
 # Maven
 # Helm to support using charts from within your build:
 # SenchaCmd:
-ARG MAVEN_VERSION=3.8.6 \
-    MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26 \
-    USER_HOME_DIR="/root"
-ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries \
-    HELM_VERSION=3.7.2 \
-    SENCHA_VERSION=7.6.0.87 \
-    PNPM_VERSION=7.13.4 \
-    MAINTAINER='PROVOCON https://github.com/provocon/'
+ARG MAVEN_VERSION=3.8.6
+ARG MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26
+ARG USER_HOME_DIR="/root"
+ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG HELM_VERSION=3.7.2
+ARG SENCHA_VERSION=7.6.0.87
+ARG PNPM_VERSION=7.13.4
+ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="${MAINTAINER}"
 LABEL PNPM_VERSION="${PNPM_VERSION}"
@@ -41,9 +41,9 @@ ENV MAVEN_HOME /usr/share/maven \
     SCREEN_GEOMETRY "1440x900x24"
 
 # The tools cosign, xz, zip, openssh etc are helpers for common CI usages
-# Maven package depends on openjdk8-jre, so a manual installation is necessary
-# https://github.com/Docker-Hub-frolvlad/docker-alpine-glibc/blob/master/Dockerfile
 RUN apk add -q curl ca-certificates xz zip p7zip parallel sudo git bash openssh-client font-noto gnupg cosign && \
+    ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
+    echo "Detecting architecture label $ARCH" && \
     curl -fsSL -o /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
     echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
     apk update && \
@@ -68,9 +68,9 @@ RUN apk add -q curl ca-certificates xz zip p7zip parallel sudo git bash openssh-
     npm install -g pnpm@${PNPM_VERSION} && \
     export PNPM_HOME=/usr/local/bin && \
     pnpm install -g pnpm@${PNPM_VERSION} && \
-    curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
+    curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-${ARCH}.tar.gz" 2> /dev/null && \
     tar xzf helm.tar.gz && \
-    mv linux-amd64/helm /usr/local/bin && \
+    mv linux-${ARCH}/helm /usr/local/bin && \
     rm -rf helm.tar.gz linux-amd /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc \
            /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
 
