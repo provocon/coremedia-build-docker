@@ -1,12 +1,15 @@
-# CoreMedia Build Container
+# CoreMedia Build Image
 
-This repository contains the necessary parts to create a Docker image with the
-few required tools to build [CoreMedia][coremedia] Plattforms starting from
-17nm up to 22nm as used in CoreMedia Content Cloud 11, CoreMedia Content Cloud
-10, CMS-9, and CoreMedia Live Context 3 workspaces.
+This repository provides a Docker image with the few required tools to build
+[CoreMedia][coremedia] Platforms starting from 17nm up to 22nm as used in
+CoreMedia Content Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia
+Live Context 3 workspaces.
 
-The home of this repository is at [GitHub][github] with a mirror at
-[GitLab][gitlab].
+Ready to use examples for some CI environments are also included for unchanged
+integration with platform workspaces without customizations.
+
+The home for the sources to create the image lives at [GitHub][github] with a
+mirror at [GitLab][gitlab].
 
 
 ## Feedback
@@ -17,11 +20,11 @@ for feedback.
 
 ## Goals
 
-This container is intended for use in container based CI system like the
+This image is intended for use in container based CI system like the
 [GitLab][gitlabci] CI or [GitHub][actions] Actions. Example starting points are
 included with this repository.
 
-Also some common tools for additional preparation steps are included like
+Also, some common tools for additional preparation steps are included like
 
 * `git`
 * `gnupg`
@@ -69,7 +72,7 @@ So, with [GitLab CI][gitlabci] and [GitHub Actions][actions] the steps are
 
 ### Adding secrets
 
-These values habe to be added as CI variables for GitLab or action secrets for
+These values have to be added as CI variables for GitLab or action secrets for
 GitHub respectively.
 
 CoreMedia Maven Artifacts Repository User and Password:
@@ -101,7 +104,7 @@ The preparation of the container is accomplished using the usual
 docker build -t <myname> .
 ```
 
-So, for the current version this is
+So, for the current version, this is
 
 ```
 docker build -t provocon/coremedia-build:2207.1 .
@@ -117,7 +120,7 @@ docker push provocon/coremedia-build:latest
 
 ### Scripted Build
 
-Alternatively you could use the [Gradle Build Tool][gradle] and issue
+Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
 ./gradlew -PbuildTag=2207.1 dockerPush
