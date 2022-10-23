@@ -149,11 +149,16 @@ Client:
 ```
 
 ```
+$ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
+github.com/docker/buildx v0.9.1 ed00243a0ce2a0aee75311b06e32d33b44729689
+```
+
+```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
-Maven home: /usr/share/maven
-Java version: 11.0.16.1, vendor: Amazon.com Inc., runtime: /usr/lib/jvm/java-11-amazon-corretto
-Default locale: en_US, platform encoding: UTF-8
+Maven home: /usr/local/maven
+Java version: 11.0.16.1, vendor: Eclipse Adoptium, runtime: /usr/local/jdk-11.0.16.1+1
+Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "5.10.0-18-amd64", arch: "amd64", family: "unix"
 ```
 
@@ -166,7 +171,7 @@ Sencha Cmd v7.6.0.87
 To call the container image use
 
 ```
-docker run -it provocon/coremedia-build /bin/bash
+docker run -it --rm provocon/coremedia-build /bin/bash
 ```
 
 [sencha]: https://www.sencha.com/products/extjs/cmd-download/

@@ -16,63 +16,63 @@
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
 FROM docker:20.10
 
-# Maven
-# Helm to support using charts from within your build:
-# SenchaCmd:
 ARG MAVEN_VERSION=3.8.6
 ARG MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26
 ARG USER_HOME_DIR="/root"
-ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/$MAVEN_VERSION/binaries
 ARG HELM_VERSION=3.7.2
 ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=7.13.4
 ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
-LABEL maintainer="${MAINTAINER}"
-LABEL PNPM_VERSION="${PNPM_VERSION}"
+LABEL maintainer="$MAINTAINER"
+LABEL Maven="$MAVEN_VERSION"
+LABEL SenchaCmd="$SENCHA_VERSION"
+LABEL Helm="$HELM_VERSION"
+LABEL PNPM="$PNPM_VERSION"
 
-ENV MAVEN_HOME /usr/share/maven \
-    MAVEN_CONFIG "$USER_HOME_DIR/.m2" \
-    JAVA_HOME=/usr/lib/jvm/default-jvm \
-    PNPM_HOME=/usr/local/bin \
-    PATH="$JAVA_HOME/bin:$PATH:/usr/local/sencha" \
-    LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8' \
-    DISPLAY :20.0 \
-    SCREEN_GEOMETRY "1440x900x24"
+ENV DOCKER_TLS_CERTDIR=/certs
+ENV MAVEN_HOME /usr/local/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+ENV JAVA_HOME=/usr/local/java
+ENV PNPM_HOME=/usr/local/bin
+ENV PATH="$JAVA_HOME/bin:$PATH:/usr/local/sencha"
+ENV LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8'
+ENV DISPLAY :20.0
+ENV SCREEN_GEOMETRY "1440x900x24"
+
+WORKDIR /usr/local
 
 # The tools cosign, xz, zip, openssh etc are helpers for common CI usages
-RUN apk add -q curl ca-certificates xz zip p7zip parallel sudo git bash openssh-client font-noto gnupg cosign && \
-    ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
-    echo "Detecting architecture label $ARCH" && \
-    curl -fsSL -o /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
-    echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
-    apk update && \
-    apk add -q amazon-corretto-11 nodejs npm && \
-    mkdir -p /usr/share/maven /usr/share/maven/ref  && \
-    curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-    echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - && \
-    tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 && \
-    ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
-    curl -o /usr/local/sencha.zip http://cdn.sencha.com/cmd/${SENCHA_VERSION}/no-jre/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh.zip 2> /dev/null && \
-    cd /usr/local && \
-    unzip /usr/local/sencha.zip && \
-    /usr/local/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh -q -d --illegal-access=warn -dir /usr/local/sencha/${SENCHA_VERSION} && \
-    mkdir /usr/local/sencha/repo && \
-    chmod 777 /usr/local/sencha/repo && \
-    ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
-    rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
-    rm /usr/local/sencha/${SENCHA_VERSION}/bin/linux-x64/node/node && \
-    ln -s /usr/bin/node /usr/local/sencha/${SENCHA_VERSION}/bin/linux-x64/node/node && \
+RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client font-noto gnupg nodejs npm cosign && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
-    fc-cache -fv && \
-    npm install -g pnpm@${PNPM_VERSION} && \
-    export PNPM_HOME=/usr/local/bin && \
-    pnpm install -g pnpm@${PNPM_VERSION} && \
-    curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-${ARCH}.tar.gz" 2> /dev/null && \
-    tar xzf helm.tar.gz && \
-    mv linux-${ARCH}/helm /usr/local/bin && \
-    rm -rf helm.tar.gz linux-amd /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc \
-           /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
+    fc-cache -f && \
+    npm install -g pnpm@$PNPM_VERSION && \
+    pnpm install -g pnpm@$PNPM_VERSION && \
+    ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
+    MACHINE=$(uname -m|sed -e 's/86_//g') && \
+    echo "Detecting architecture $ARCH / $MACHINE" && \
+    curl -Lo java.tgz \
+    "https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.16.1%2B1/OpenJDK11U-jdk_${MACHINE}_alpine-linux_hotspot_11.0.16.1_1.tar.gz" 2> /dev/null && \
+    tar xzf java.tgz && \
+    ln -s jdk* java && \
+    curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
+    tar xzf helm.tgz && \
+    mv linux-$ARCH/helm bin && \
+    mkdir -p $MAVEN_HOME $MAVEN_HOME/ref  && \
+    curl -Lo maven.tgz $MAVEN_BASE_URL/apache-maven-$MAVEN_VERSION-bin.tar.gz 2> /dev/null && \
+    echo "$MAVEN_SHA  maven.tgz" | sha512sum -c - && \
+    tar xzf maven.tgz -C $MAVEN_HOME --strip-components=1 && \
+    ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn && \
+    curl -Lo sencha.zip http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip 2> /dev/null && \
+    unzip sencha.zip && \
+    ./SenchaCmd-$SENCHA_VERSION-linux-amd64.sh -q -d --illegal-access=warn -dir /usr/local/sencha/$SENCHA_VERSION && \
+    mkdir -p sencha/repo && \
+    chmod 777 sencha/repo && \
+    ln -s /usr/local/sencha/sencha-$SENCHA_VERSION /usr/local/bin/sencha && \
+    rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
+    ln -s /usr/bin/node /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
+    rm -rf linux-* *.tgz *.zip *.sh java/lib/src.zip java/legal java/[mNr]* /root/.[cjn]* /var/cache/apk/*
 
 EXPOSE 4444
 
