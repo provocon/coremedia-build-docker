@@ -19,14 +19,14 @@ FROM docker:20.10
 # Maven
 # Helm to support using charts from within your build:
 # SenchaCmd:
-ARG MAVEN_VERSION=3.8.6 \
-    MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26 \
-    USER_HOME_DIR="/root"
-ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries \
-    HELM_VERSION=3.7.2 \
-    SENCHA_VERSION=7.2.0.84 \
-    PNPM_VERSION=7.1.5 \
-    MAINTAINER='PROVOCON https://github.com/provocon/'
+ARG MAVEN_VERSION=3.8.6
+ARG MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26
+ARG USER_HOME_DIR="/root"
+ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG HELM_VERSION=3.7.2
+ARG SENCHA_VERSION=7.2.0.84
+ARG PNPM_VERSION=7.1.5
+ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="${MAINTAINER}"
 
@@ -74,14 +74,18 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     wget -qO /etc/apk/keys/amazoncorretto.rsa.pub  https://apk.corretto.aws/amazoncorretto.rsa.pub && \
     echo "https://apk.corretto.aws/" >> /etc/apk/repositories && \
     apk update && \
-    apk upgrade && \
+echo ""
+RUN \
+    apk upgrade --force-overwrite && \
+echo ""
+RUN \
     apk add -q curl amazon-corretto-11 && \
     mkdir -p /usr/share/maven /usr/share/maven/ref  && \
     curl -fsSL -o /tmp/apache-maven.tar.gz ${MAVEN_BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
     echo "${MAVEN_SHA}  /tmp/apache-maven.tar.gz" | sha512sum -c - && \
     tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 && \
     ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
-    rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz /var/cache/apk/*
+    rm -rf /tmp/apache-maven.tar.gz /tmp/*.apk /tmp/gcc /tmp/gcc-libs.tar.xz /tmp/libz /tmp/libz.tar.xz
 
 # Default configuration
 LABEL PNPM_VERSION="${PNPM_VERSION}"
@@ -103,7 +107,7 @@ ENV MAVEN_HOME /usr/share/maven \
 # The tools cosign, xz, zip, openssh etc are helpers for common CI usages
 RUN \
   apk add -q xz zip p7zip parallel sudo git bash openssh-client font-noto gnupg && \
-  fc-cache -fv && \
+  fc-cache -f && \
   curl -o /usr/local/sencha.zip http://cdn.sencha.com/cmd/${SENCHA_VERSION}/no-jre/SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh.zip 2> /dev/null && \
   cd /usr/local && \
   unzip /usr/local/sencha.zip && \
@@ -111,15 +115,17 @@ RUN \
   mkdir /usr/local/sencha/repo && \
   chmod 777 /usr/local/sencha/repo && \
   ln -s /usr/local/sencha/sencha-${SENCHA_VERSION} /usr/local/bin/sencha && \
+  rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
+  ln -s /usr/bin/node /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
   rm -f sencha.zip SenchaCmd-${SENCHA_VERSION}-linux-amd64.sh && \
   apk add -q nodejs npm && \
   npm install -g pnpm@${PNPM_VERSION} && \
   export PNPM_HOME=/usr/local/bin && \
   pnpm install -g pnpm@${PNPM_VERSION} && \
   curl -Lo helm.tar.gz "https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz" 2> /dev/null && \
-  tar xvzf helm.tar.gz && \
+  tar xzf helm.tar.gz && \
   mv linux-amd64/helm /usr/local/bin && \
-  rm -rf helm.tar.gz linux-amd
+  rm -rf helm.tar.gz linux-*
 
 # Chromium: Taken from https://stackoverflow.com/a/48295423
 RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
@@ -130,7 +136,8 @@ RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repos
 
 # Cosign images signing option
 RUN \
-  apk add -q cosign@edge
+  apk add -q cosign@edge && \
+  rm -rf /var/cache/apk/*
 
 EXPOSE 4444
 

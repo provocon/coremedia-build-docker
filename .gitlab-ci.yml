@@ -29,7 +29,7 @@ stages:
 variables:
   BASE_NAME: coremedia-build
   IMAGE_NAME: "${CI_PROJECT_NAMESPACE}/$BASE_NAME"
-  TAG: "2110.4"
+  TAG: "2110.5"
   SHORT_TAG: "2110"
 
 build:
