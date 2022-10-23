@@ -27,7 +27,7 @@
 # CoreMedia NPM Registry Token
 #   NPMRC_TOKEN
 #
-image: provocon/coremedia-build:2110.3
+image: provocon/coremedia-build:2110.5
 
 # Because $envName-Deployments are manual jobs, they could be executed without
 # a prior build because in almost any cases docker container were present and
