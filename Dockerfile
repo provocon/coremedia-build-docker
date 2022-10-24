@@ -48,7 +48,6 @@ RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
     npm install -g pnpm@$PNPM_VERSION && \
-    pnpm install -g pnpm@$PNPM_VERSION && \
     ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
     MACHINE=$(uname -m|sed -e 's/86_//g') && \
     echo "Detecting architecture $ARCH / $MACHINE" && \
