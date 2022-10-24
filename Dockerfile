@@ -25,7 +25,7 @@ ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
 ARG HELM_VERSION=3.7.2
 ARG SENCHA_VERSION=7.2.0.84
-ARG PNPM_VERSION=7.1.5
+ARG PNPM_VERSION=6.35.0
 ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="${MAINTAINER}"
