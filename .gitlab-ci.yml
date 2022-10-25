@@ -18,7 +18,7 @@
 # External Container Repository:
 #   DH_REGISTRY_USER
 #   DH_REGISTRY_PASSWORD
-image: provocon/coremedia-build:latest
+image: docker:20.10
 
 services:
   - docker:dind
@@ -38,8 +38,7 @@ build:
   - tags
   script:
     - echo Image $IMAGE_NAME
-    - ./gradlew
-    - echo Image $IMAGE_NAME
+    - docker build -t "${IMAGE_NAME}:latest" .
     - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
     - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
     - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
@@ -47,19 +46,19 @@ build:
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
-    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+    - docker image save -o ${CI_PROJECT_NAME}.oci ${IMAGE_NAME}
 
 release:
   stage: image
   only:
     - tags
   script:
-    - ./gradlew
-    - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
     - echo Image $IMAGE_NAME
+    - docker build -t "${IMAGE_NAME}:latest" .
+    - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
     - docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:$SHORT_TAG"
     - docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:$TAG"
     - docker push "${IMAGE_NAME}:$TAG"
     - docker push "${IMAGE_NAME}:$SHORT_TAG"
     - docker push "${IMAGE_NAME}:latest"
-    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+    - docker image save -o ${CI_PROJECT_NAME}.oci ${IMAGE_NAME}
