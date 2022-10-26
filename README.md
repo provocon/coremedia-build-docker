@@ -1,9 +1,12 @@
 # CoreMedia Build Image
 
-This repository provides a Docker image with the few required tools to build
-[CoreMedia][coremedia] Platforms starting from 17nm up to 22nm as used in
-CoreMedia Content Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia
-Live Context 3 workspaces.
+This repository provides an image for use with [podman][podman], Docker, and
+similar systems with the required tools to build [CoreMedia][coremedia] Content
+Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live Context 3
+workspaces. Supports platform versions range from 17nm to 22nm.
+
+Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively
+from the [GitHub][github] project registry.
 
 Ready to use examples for some CI environments are also included for unchanged
 integration with platform workspaces without customizations.
@@ -20,9 +23,10 @@ for feedback.
 
 ## Goals
 
-This image is intended for use in container based CI system like the
-[GitLab][gitlabci] CI or [GitHub][actions] Actions. Example starting points are
-included with this repository.
+This image is intended for use in container based CI systems like the
+[GitLab CI][gitlabci] or [GitHub Actions][actions]. Example starting points are
+included with this repository, which work within the bounds of the public
+shared runner limitations.
 
 Also, some common tools for additional preparation steps are included like
 
@@ -32,6 +36,8 @@ Also, some common tools for additional preparation steps are included like
 * `openssh`
 
 and some compression tools.
+
+We like to support different hardware architectures where appropriate.
 
 
 ## Availability
@@ -45,6 +51,9 @@ required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
 The latest Tag works with - at least again - CMCC-11-2207.
+
+Unpublished, daily builds are available from the [GitHub][github] and
+[GitLab][gitlab] project registries.
 
 
 ## Usage
@@ -118,6 +127,9 @@ docker push provocon/coremedia-build:2207
 docker push provocon/coremedia-build:latest
 ```
 
+You could as well use [podman][podman] instead of docker in each of the lines.
+
+
 ### Scripted Build
 
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
@@ -181,6 +193,7 @@ docker run -it --rm provocon/coremedia-build /bin/bash
 [npm]: https://www.npmjs.com/
 [gitlabci]: https://docs.gitlab.com/ee/ci/
 [actions]: https://github.com/features/actions
+[podman]: https://podman.io/
 [dockerhub]: https://hub.docker.com/
 [issues]: https://github.com/provocon/coremedia-build-docker/issues
 [github]: https://github.com/provocon/coremedia-build-docker
