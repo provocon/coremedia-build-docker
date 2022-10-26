@@ -52,9 +52,9 @@ RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client
     MACHINE=$(uname -m|sed -e 's/86_//g') && \
     echo "Detecting architecture $ARCH / $MACHINE" && \
     curl -Lo java.tgz \
-    "https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.16.1%2B1/OpenJDK11U-jdk_${MACHINE}_alpine-linux_hotspot_11.0.16.1_1.tar.gz" 2> /dev/null && \
+             "https://cdn.azul.com/zulu/bin/zulu11.60.19-ca-jdk11.0.17-linux_musl_${MACHINE}.tar.gz" 2> /dev/null && \
     tar xzf java.tgz && \
-    ln -s jdk* java && \
+    ln -s zulu* java && \
     curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
@@ -63,7 +63,8 @@ RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client
     echo "$MAVEN_SHA  maven.tgz" | sha512sum -c - && \
     tar xzf maven.tgz -C $MAVEN_HOME --strip-components=1 && \
     ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn && \
-    curl -Lo sencha.zip http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip 2> /dev/null && \
+    curl -Lo sencha.zip \
+             http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip 2> /dev/null && \
     unzip sencha.zip && \
     ./SenchaCmd-$SENCHA_VERSION-linux-amd64.sh -q -d --illegal-access=warn -dir /usr/local/sencha/$SENCHA_VERSION && \
     mkdir -p sencha/repo && \
