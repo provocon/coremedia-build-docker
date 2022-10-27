@@ -43,7 +43,6 @@ build:
     - echo Image $IMAGE_NAME
     - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
     - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
-    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
     - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
@@ -53,12 +52,12 @@ release:
   stage: image
   only:
     - tags
+  when: manual
   script:
     - ./gradlew -PbuildTag=$TAG docker
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
     - echo $IMAGE_NAME
     - docker tag "${IMAGE_NAME}:$TAG" "${IMAGE_NAME}:$SHORT_TAG"
-    - docker tag "${IMAGE_NAME}:$TAG" "${IMAGE_NAME}:latest"
     - docker push "${IMAGE_NAME}:$TAG"
     - docker push "${IMAGE_NAME}:$SHORT_TAG"
     - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
