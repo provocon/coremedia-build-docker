@@ -34,8 +34,8 @@ variables:
 
 build:
   stage: image
-  except:
-  - tags
+  except: 
+    - tags
   script:
     - echo Image $IMAGE_NAME
     - docker build -t "${IMAGE_NAME}:latest" .
@@ -50,8 +50,9 @@ build:
 
 release:
   stage: image
-  only:
+  only: 
     - tags
+  when: manual
   script:
     - echo Image $IMAGE_NAME
     - docker build -t "${IMAGE_NAME}:latest" .
