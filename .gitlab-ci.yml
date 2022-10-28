@@ -34,32 +34,27 @@ variables:
 
 build:
   stage: image
-  except: 
-    - tags
+  except:
+  - tags
   script:
     - echo Image $IMAGE_NAME
-    - docker build -t "${IMAGE_NAME}:latest" .
-    - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
-    - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
-    - docker tag "${IMAGE_NAME}:latest" "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
-    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
-    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest"
-    - docker image save -o ${CI_PROJECT_NAME}.oci ${IMAGE_NAME}
+    - docker buildx create --use
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64
+                          -t "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64
+                          -t "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64
+                          -t "${CI_REGISTRY}/${IMAGE_NAME}-docker:latest" .
 
 release:
   stage: image
-  only: 
+  only:
     - tags
-  when: manual
   script:
     - echo Image $IMAGE_NAME
-    - docker build -t "${IMAGE_NAME}:latest" .
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:$SHORT_TAG"
-    - docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:$TAG"
-    - docker push "${IMAGE_NAME}:$TAG"
-    - docker push "${IMAGE_NAME}:$SHORT_TAG"
-    - docker push "${IMAGE_NAME}:latest"
-    - docker image save -o ${CI_PROJECT_NAME}.oci ${IMAGE_NAME}
+    - docker buildx create --use
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$SHORT_TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:latest" .
