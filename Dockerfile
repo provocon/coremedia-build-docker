@@ -36,7 +36,7 @@ ENV MAVEN_HOME /usr/local/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 ENV JAVA_HOME=/usr/local/java
 ENV PNPM_HOME=/usr/local/bin
-ENV PATH="$JAVA_HOME/bin:$PATH:/usr/local/sencha"
+ENV PATH="$PATH:/usr/local/sencha:$JAVA_HOME/bin"
 ENV LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8'
 ENV DISPLAY :20.0
 ENV SCREEN_GEOMETRY "1440x900x24"
@@ -47,31 +47,36 @@ WORKDIR /usr/local
 RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client font-noto gnupg nodejs npm cosign && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
+    PATH=/usr/bin:$PATH && \
     npm install -g pnpm@$PNPM_VERSION && \
-    ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
-    MACHINE=$(uname -m|sed -e 's/86_//g') && \
-    echo "Detecting architecture $ARCH / $MACHINE" && \
-    curl -Lo java.tgz \
-             "https://cdn.azul.com/zulu/bin/zulu11.60.19-ca-jdk11.0.17-linux_musl_${MACHINE}.tar.gz" 2> /dev/null && \
-    tar xzf java.tgz && \
-    ln -s zulu* java && \
-    curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
-    tar xzf helm.tgz && \
-    mv linux-$ARCH/helm bin && \
     mkdir -p $MAVEN_HOME $MAVEN_HOME/ref  && \
     curl -Lo maven.tgz $MAVEN_BASE_URL/apache-maven-$MAVEN_VERSION-bin.tar.gz 2> /dev/null && \
     echo "$MAVEN_SHA  maven.tgz" | sha512sum -c - && \
     tar xzf maven.tgz -C $MAVEN_HOME --strip-components=1 && \
     ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn && \
-    curl -Lo sencha.zip \
-             http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip 2> /dev/null && \
+    ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
+    MACHINE=$(uname -m|sed -e 's/86_//g') && \
+    echo "Detecting architecture $ARCH / $MACHINE" && \
+    curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
+    tar xzf helm.tgz && \
+    mv linux-$ARCH/helm bin && \
+    echo "Installing Java" && \
+    URL="https://cdn.azul.com/zulu/bin/zulu11.60.19-ca-jdk11.0.17-linux_musl_${MACHINE}.tar.gz" && \
+    curl -Lo java.tgz $URL 2> /dev/null && \
+    tar xzf java.tgz && \
+    ln -s zulu* java && \
+    echo "Installing SenchaCmd" && \
+    URL="http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip" && \
+    curl -Lo sencha.zip $URL 2> /dev/null && \
     unzip sencha.zip && \
-    ./SenchaCmd-$SENCHA_VERSION-linux-amd64.sh -q -d --illegal-access=warn -dir /usr/local/sencha/$SENCHA_VERSION && \
+    ./SenchaCmd-$SENCHA_VERSION-linux-amd64.sh -q -d --illegal-access=warn \
+               -dir /usr/local/sencha/$SENCHA_VERSION && \
     mkdir -p sencha/repo && \
     chmod 777 sencha/repo && \
     ln -s /usr/local/sencha/sencha-$SENCHA_VERSION /usr/local/bin/sencha && \
     rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
-    ln -s /usr/bin/node /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
+    ln -s $(which node) /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
+    echo "Cleaning Up" && \
     rm -rf linux-* *.tgz *.zip *.sh java/lib/src.zip java/legal java/[mNr]* /root/.[cjn]* /var/cache/apk/*
 
 EXPOSE 4444
