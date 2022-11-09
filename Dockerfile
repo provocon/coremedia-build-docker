@@ -79,6 +79,4 @@ RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client
     echo "Cleaning Up" && \
     rm -rf linux-* *.tgz *.zip *.sh java/lib/src.zip java/legal java/[mNr]* /root/.[cjn]* /var/cache/apk/*
 
-EXPOSE 4444
-
 CMD ["bash"]
