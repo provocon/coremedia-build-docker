@@ -39,7 +39,8 @@ build:
   script:
     - echo Image $IMAGE_NAME
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker buildx create --use
+    - docker context create multi
+    - docker buildx create --use multi
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64
                           -t "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG" .
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64
@@ -54,7 +55,8 @@ release:
   script:
     - echo Image $IMAGE_NAME
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker buildx create --use
+    - docker context create multi
+    - docker buildx create --use multi
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$TAG" .
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$SHORT_TAG" .
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:latest" .
