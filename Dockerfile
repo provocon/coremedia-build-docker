@@ -61,7 +61,7 @@ RUN apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
     echo "Installing Java" && \
-    URL="https://cdn.azul.com/zulu/bin/zulu11.60.19-ca-jdk11.0.17-linux_musl_${MACHINE}.tar.gz" && \
+    URL="https://cdn.azul.com/zulu/bin/zulu11.62.17-ca-jdk11.0.18-linux_musl_${MACHINE}.tar.gz" && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
     ln -s zulu* java && \
