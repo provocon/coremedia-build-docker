@@ -150,11 +150,11 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           20.10.18
+ Version:           20.10.21
  API version:       1.41
- Go version:        go1.18.6
- Git commit:        b40c2f6
- Built:             Thu Sep  8 23:05:51 2022
+ Go version:        go1.18.7
+ Git commit:        baeda1f
+ Built:             Tue Oct 25 17:56:30 2022
  OS/Arch:           linux/amd64
  Context:           default
  Experimental:      true
@@ -167,11 +167,11 @@ github.com/docker/buildx v0.9.1 ed00243a0ce2a0aee75311b06e32d33b44729689
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
+Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)
 Maven home: /usr/local/maven
-Java version: 11.0.16.1, vendor: Eclipse Adoptium, runtime: /usr/local/jdk-11.0.16.1+1
+Java version: 11.0.18, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.62.17-ca-jdk11.0.18-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-18-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.10.0-19-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
