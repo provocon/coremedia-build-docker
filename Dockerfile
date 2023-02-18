@@ -16,10 +16,10 @@
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
 FROM docker:20.10
 
-ARG MAVEN_VERSION=3.8.6
-ARG MAVEN_SHA=f790857f3b1f90ae8d16281f902c689e4f136ebe584aba45e4b1fa66c80cba826d3e0e52fdd04ed44b4c66f6d3fe3584a057c26dfcac544a60b301e6d0f91c26
+ARG MAVEN_VERSION=3.8.7
+ARG MAVEN_SHA=21c2be0a180a326353e8f6d12289f74bc7cd53080305f05358936f3a1b6dd4d91203f4cc799e81761cf5c53c5bbe9dcc13bdb27ec8f57ecf21b2f9ceec3c8d27
 ARG USER_HOME_DIR="/root"
-ARG MAVEN_BASE_URL=https://dlcdn.apache.org/maven/maven-3/$MAVEN_VERSION/binaries
+ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
 ARG HELM_VERSION=3.7.2
 ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=7.13.4
