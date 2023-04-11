@@ -181,7 +181,7 @@ Sencha Cmd v7.6.0.87
 ```
 
 ```
-docker run --name docker --rm -it --entrypoint=node provocon/coremedia-build -v
+docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
 v16.19.1
 ```
 
