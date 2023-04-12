@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # Example starting point for a GitLab build file for CoreMedia CMCC workspaces
-# to build a separate deployment script archive and maven artifact archive.
 #
 # Relies on the following variables to be set for maven config:
 #   MAVEN_OPTS
@@ -22,6 +21,9 @@
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
+#
+# CoreMedia NPM Registry Token
+#   NPMRC_TOKEN
 #
 image: provocon/coremedia-build:latest
 
@@ -55,8 +57,9 @@ Build:
   cache:
     key: "cmcc-11"
     paths:
-      - .remote-packages/
-      - $CI_PROJECT_DIR/repository
+      - .pnpm-store
+      - repository
+      - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
     - docker:20.10-dind
@@ -64,14 +67,14 @@ Build:
     # Pre-fill docker images to use locally with authenticated requests:
     # - echo "Login in as _${DH_REGISTRY_USER}_"
     # - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    # - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
+    # - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
     # Cache preparation and check
     - mkdir -p $CI_PROJECT_DIR/repository
-    - mkdir -p .remote-packages
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    - mkdir -p .pnpm-store
+    - remoteFiles=$(find .pnpm-store -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
     # To support reproducable builds, CoreMedia uses a dummy date.
     # We replace this by the commit date, which should also remain constant.
     - BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
@@ -101,14 +104,11 @@ Build:
       mvn install -Dmaven.compiler.forceJavacCompilerUse=true \
       -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
       -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
-      -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
-      -Dwebdriver.chrome.verboseLogging=true \
-      -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
       -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
       -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
     #
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    - remoteFiles=$(find .pnpm-store -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
 
 # Package and Push Containers
 Push:
@@ -116,8 +116,9 @@ Push:
   cache:
     key: "cmcc-11"
     paths:
-      - .remote-packages/
-      - $CI_PROJECT_DIR/repository
+      - .pnpm-store
+      - repository
+      - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
     - docker:20.10-dind
@@ -126,7 +127,7 @@ Push:
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
     # Cache check - must not be empty
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    - remoteFiles=$(find apps/studio-client/node_modules -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
     # To support reproducable builds, CoreMedia uses a dummy date.
     # We replace this by the commit date, which should also remain constant.
     - BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
@@ -147,54 +148,60 @@ Push:
       fi
     # Pre-fill docker images to use locally with authenticated requests:
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker pull 'coremedia/java-application-base:2.3.1-openjdk-11-jre'
+    - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     #
     # studio client has to be build separately
     - cd apps/studio-client
-    - cp $CI_PROJECT_DIR/workspace-configuration/npmrc .npmrc
-    - pnpm install
-    - pnpm -r run build
-    - pnpm -r run package --filter @coremedia-blueprint/studio-client.studio
-    - export TOOLING="provocon/coremedia-build:latest"
-    - export DOCKER_BUILDKIT=1
-    - export CI=true
-    - docker build . -t 'coremedia/studio-client:latest' --network=host --secret id=npmrc,src=.npmrc --build-arg TYPE="build" --build-arg STUDIO_CLIENT_TOOLING_IMAGE="$TOOLING"
+    - echo "@coremedia:registry=https://npm.coremedia.io" > .npmrc
+    - echo "@jangaroo:registry=https://npm.coremedia.io" >> .npmrc
+    - echo "//npm.coremedia.io/:_authToken=$NPMRC_TOKEN" >> .npmrc
+    - echo "unsafe-perm=true" >> .npmrc
+    - CI=true
+    - pnpm install --no-frozen-lockfile
+    - pnpm -r build
+    - pnpm -r package
+    - DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
+    - pnpm store prune
     - cd ../..
+    # Log into target registry
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    # Derive image tag
+    - imageTag=$(echo $CI_COMMIT_REF_NAME|sed -e 's/^v\([0-9][0-9\.]*\)-CMCC/\1/g')
     #
     # Re-run maven with a pre-filled cache and now add image generation
-    # only in the needed submodules to avoid full re-build
+    # only in the needed submodules to avoid full re-build.
+    # Immediately push and remove image to save disk-space in CI
+    #
+    # We push to the branch name tags for snapshots and to $CI_COMMIT_REF_NAME and latest for releases.
+    # Release tags are recognized by names starting with v like in v1.2.4.
+    # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry.
+    # (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
+    #
     - |
       for PART in $(grep -l default-image $(find -name "pom.xml")) ; do
         echo "Packaging $PART"
         mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
         -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
-        -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage \
-        -Dwebdriver.chrome.verboseLogging=true \
-        -Dwebdriver.chrome.driver=/usr/bin/chromedriver \
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false -f $PART
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false -f $PART
+
+        coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)
+        for coremImage in $coremImages ; do
+          filename="$(echo $coremImage | sed s/coremedia.//)"
+          newImageName="$(echo $coremImage | sed s/coremedia/$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}/)"
+          echo "Pushing $filename: $coremImage - $newImageName"
+          if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker tag $coremImage "${newImageName}:latest" ; fi
+          docker tag $coremImage "${newImageName}:$imageTag"
+          if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker push "${newImageName}:latest" ; fi
+          docker push "${newImageName}:$imageTag"
+          if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker rmi "${newImageName}:latest" ; fi
+          docker rmi "${newImageName}:$imageTag"
+          docker rmi $coremImage
+        done
       done
     - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}} {{.Size}}"
-    # select images to tag and push
-    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
-    - imageTag=$(echo $CI_COMMIT_REF_NAME|sed -e 's/^v\([0-9][0-9\.]*\)-CMCC/\1/g')
-    # We push to the branch name tags for snapshots and to $CI_COMMIT_REF_NAME and latest for releases.
-    # Release tags are recognized by names starting with v like in v1.2.4.
-    # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry. 
-    # (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
-    - |
-      for coremImage in $coremImages ; do
-        filename="$(echo $coremImage | sed s/coremedia.//)"
-        newImageName="$(echo $coremImage | sed s/coremedia/$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}/)"
-        echo "$filename: $coremImage  - $newImageName"
-        if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker tag $coremImage "${newImageName}:latest" ; fi
-        docker tag $coremImage "${newImageName}:$imageTag"
-        if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker push "${newImageName}:latest" ; fi
-        docker push "${newImageName}:$imageTag"
-      done
-    # Don't keep to much transient stuff
+    # Don't keep too much transient stuff
     - rm -rf $(find $CI_PROJECT_DIR/repository/com/coremedia -name "$VERSION_AFTER")
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
-    - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
+    - remoteFiles=$(find apps/studio-client/node_modules -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"

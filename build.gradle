@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Markus Schwarz, Martin Goellnitz for Provocon.
+ * Copyright 2020-2023 Markus Schwarz, Martin Goellnitz for Provocon.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 plugins {
-  id 'com.palantir.docker' version '0.33.0' // https://github.com/palantir/gradle-docker
+  id 'com.palantir.docker' version '0.35.0' // https://github.com/palantir/gradle-docker
 }
 
 apply plugin: 'java-base'
+
+defaultTasks 'docker'
+
+def buildTag = project.hasProperty('tag') ? "$tag" : 'latest'
 
 /* Dummy configuration to be able to edit the wiki contents easily from within my IDE. */
 sourceSets {

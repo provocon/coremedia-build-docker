@@ -1,5 +1,5 @@
 #
-# Copyright 2021-2022 Provocon.
+# Copyright 2021-2023 Provocon.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 # External Container Repository:
 #   DH_REGISTRY_USER
 #   DH_REGISTRY_PASSWORD
-image: provocon/coremedia-build:latest
+image: docker:20.10
 
 services:
   - docker:dind
@@ -29,7 +29,11 @@ stages:
 variables:
   BASE_NAME: coremedia-build
   IMAGE_NAME: "${CI_PROJECT_NAMESPACE}/$BASE_NAME"
-  TAG: "2110.5"
+  REGISTRY: "${CI_REGISTRY}"
+  REGISTRY_USER: ${CI_REGISTRY_USER}
+  REGISTRY_PASSWORD: ${CI_REGISTRY_PASSWORD}
+  LAB_NAME: "${CI_REGISTRY}/${IMAGE_NAME}-docker"
+  TAG: "2110.6"
   SHORT_TAG: "2110"
 
 build:
@@ -38,26 +42,22 @@ build:
   - tags
   script:
     - echo Image $IMAGE_NAME
-    - ./gradlew -PbuildTag=$TAG docker
-    - docker images
-    - echo Image $IMAGE_NAME
-    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
-    - docker tag "${IMAGE_NAME}:$TAG" "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$TAG"
-    - docker push "${CI_REGISTRY}/${IMAGE_NAME}-docker:$SHORT_TAG"
-    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASSWORD $REGISTRY
+    - docker context create multi
+    - docker buildx create --use multi
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:$TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:$SHORT_TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:latest" .
 
 release:
   stage: image
   only:
     - tags
-  when: manual
   script:
-    - ./gradlew -PbuildTag=$TAG docker
+    - echo Image $IMAGE_NAME
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - echo $IMAGE_NAME
-    - docker tag "${IMAGE_NAME}:$TAG" "${IMAGE_NAME}:$SHORT_TAG"
-    - docker push "${IMAGE_NAME}:$TAG"
-    - docker push "${IMAGE_NAME}:$SHORT_TAG"
-    - docker image save -o build/${CI_PROJECT_NAME}.ci ${IMAGE_NAME}
+    - docker context create multi
+    - docker buildx create --use multi
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$SHORT_TAG" .
+    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:latest" .

@@ -14,21 +14,20 @@
 # limitations under the License.
 #
 # Example starting point for a GitLab build file for CoreMedia CMCC workspaces
-# to build a separate deployment script archive and maven artifact archive.
 #
-# Relies on the following variables to be set for maven config:
-#   MAVEN_OPTS
+# Relies on the following Variables to be set:
 #
-# External Container Repository:
+# External Image Repository:
 #   EXTERNAL_REGISTRY
-#   EXTERNAL_REGISTRY_PATH
 #   EXTERNAL_REGISTRY_USER
 #   EXTERNAL_REGISTRY_PASSWORD
 # CoreMedia Maven Artifacts Repository User and Password:
 #   CM_MAVEN_USER
 #   CM_MAVEN_PASSWORD
+# CoreMedia NPM Registry Token
+#   NPMRC_TOKEN
 #
-image: provocon/coremedia-build:latest
+image: provocon/coremedia-build:2110.5
 
 # Because $envName-Deployments are manual jobs, they could be executed without
 # a prior build because in almost any cases docker container were present and
@@ -36,8 +35,6 @@ image: provocon/coremedia-build:latest
 # where not executed for any reason.
 stages:
   - create
-  - deliver
-  - import
 
 variables:
   MAVEN_OPTS: $MAVEN_OPTS
@@ -58,9 +55,8 @@ variables:
   CONT_REGISTRY_PATH: "$CI_REGISTRY\\/${CI_PROJECT_NAMESPACE}\\/${CI_PROJECT_NAME}"
   CONT_REGISTRY_USER: $CI_REGISTRY_USER
   CONT_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  LEFT_OUT_CONTAINER: studio-client-k8s
 
-# Generate and store deployment archives as docker containers
+# Generate and push components as docker images
 .create_containers: &createContainers
   stage: create
   # Cache downloaded dependencies and plugins between builds.
@@ -72,7 +68,7 @@ variables:
       - $CI_PROJECT_DIR/repository
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
-    - docker:19.03.1-dind
+    - docker:20.10-dind
   script:
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -120,13 +116,13 @@ variables:
     #
     - docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}} {{.Size}}"
     # select images to tag and push
+    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v studio-packages-proxy|grep -v site-manager)
     - imageTag=$(echo $CI_COMMIT_REF_NAME|sed -e 's/^v\([0-9][0-9\.]*\)-CMCC/\1/g')
-    - coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v studio-packages-proxy|grep -v site-manager|grep -v "${LEFT_OUT_CONTAINER}$")
     # https://docs.gitlab.com/ee/user/packages/container_registry/#using-with-private-projects
     - docker login -u $CONT_REGISTRY_USER -p $CONT_REGISTRY_PASSWORD $CONT_REGISTRY
     # We push to the branch name tags for snapshots and to $CI_COMMIT_REF_NAME and latest for releases.
     # Release tags are recognized by names starting with v like in v1.2.4.
-    # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry. 
+    # Keep in mind that this could blow disk space at the target envs and in gitlab's container registry.
     # (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
     - |
       for coremImage in $coremImages ; do
@@ -138,7 +134,7 @@ variables:
         if [ ! -z "$(echo $CI_COMMIT_REF_NAME|grep ^v)" ]; then docker push "${newImageName}:latest" ; fi
         docker push "${newImageName}:$imageTag"
       done
-    # Don't keep to much transient stuff
+    # Don't keep too much transient stuff
     - rm -rf $(find $CI_PROJECT_DIR/repository/com/coremedia -name "$VERSION_AFTER")
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
@@ -158,5 +154,4 @@ Release:
     CONT_REGISTRY_PATH: "$EXTERNAL_REGISTRY\\/coremedia_cms"
     CONT_REGISTRY_USER: $EXTERNAL_REGISTRY_USER
     CONT_REGISTRY_PASSWORD: $EXTERNAL_REGISTRY_PASSWORD
-    LEFT_OUT_CONTAINER: studio-client
   <<: *createContainers
