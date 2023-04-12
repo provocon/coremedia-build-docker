@@ -47,7 +47,6 @@ build:
     - docker buildx create --use multi
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:$TAG" .
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:$SHORT_TAG" .
-    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${LAB_NAME}:latest" .
 
 release:
   stage: image
@@ -60,4 +59,3 @@ release:
     - docker buildx create --use multi
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$TAG" .
     - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:$SHORT_TAG" .
-    - docker buildx build --push --platform linux/arm64/v8,linux/amd64 -t "${IMAGE_NAME}:latest" .
