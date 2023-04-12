@@ -5,8 +5,7 @@ similar systems with the required tools to build [CoreMedia][coremedia] Content
 Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live Context 3
 workspaces. Supports platform versions range from 17nm to 22nm.
 
-Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively
-from the [GitHub][github] project registry.
+Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively.
 
 Ready to use examples for some CI environments are also included for unchanged
 integration with platform workspaces without customizations.
@@ -18,7 +17,7 @@ mirror at [GitLab][gitlab].
 ## Feedback
 
 Please use the [issues][issues] section of this repository at [GitHub][github]
-for feedback. 
+for feedback.
 
 
 ## Goals
@@ -47,7 +46,7 @@ The tag `latest` should be expected to usable for the latest release by
 [CoreMedia][coremedia].
 
 Tags are named after the first release for which the implemented changes are
-required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards. 
+required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
 The latest Tag works with - at least again - CMCC-11-2301.
@@ -181,7 +180,7 @@ Sencha Cmd v7.6.0.87
 ```
 
 ```
-docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
+$ docker run --name docker --rm -it --entrypoint=node provocon/coremedia-build -v
 v16.19.1
 ```
 
