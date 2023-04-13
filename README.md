@@ -85,21 +85,21 @@ GitHub respectively.
 
 CoreMedia Maven Artifacts Repository User and Password:
 
-* CM_MAVEN_USER
-* CM_MAVEN_PASSWORD
+* `CM_MAVEN_USER`
+* `CM_MAVEN_PASSWORD`
 
 CoreMedia NPM Registry Token:
 
-* NPMRC_TOKEN
+* `NPMRC_TOKEN`
 
 Optionally add Maven Options
 
-* MAVEN_OPTS
+* `MAVEN_OPTS`
 
 and use Docker Hub login to extend the download rate.
 
-* DH_REGISTRY_USER
-* DH_REGISTRY_PASSWORD
+* `DH_REGISTRY_USER`
+* `DH_REGISTRY_PASSWORD`
 
 
 ## Build
