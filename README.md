@@ -3,7 +3,7 @@
 This repository provides an image for use with [podman][podman], Docker, and
 similar systems with the required tools to build [CoreMedia][coremedia] Content
 Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live Context 3
-workspaces. Supports platform versions range from 17nm to 22nm.
+workspaces. Supports platform versions range from 17nm to 23nm.
 
 Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively.
 
