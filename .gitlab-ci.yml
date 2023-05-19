@@ -33,8 +33,8 @@ variables:
   REGISTRY_USER: ${CI_REGISTRY_USER}
   REGISTRY_PASSWORD: ${CI_REGISTRY_PASSWORD}
   LAB_NAME: "${CI_REGISTRY}/${IMAGE_NAME}-docker"
-  TAG: "2207.3"
-  SHORT_TAG: "2207"
+  TAG: "2304.1"
+  SHORT_TAG: "2304"
 
 build:
   stage: image

@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
-FROM docker:20.10.20
+FROM docker:20.10
 
 ARG MAVEN_VERSION=3.8.8
 ARG MAVEN_SHA=332088670d14fa9ff346e6858ca0acca304666596fec86eea89253bd496d3c90deae2be5091be199f48e09d46cec817c6419d5161fb4ee37871503f472765d00
@@ -22,7 +22,7 @@ ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
 ARG HELM_VERSION=3.7.2
 ARG SENCHA_VERSION=7.6.0.87
-ARG PNPM_VERSION=7.13.6
+ARG PNPM_VERSION=8.1.1
 ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="$MAINTAINER"
@@ -62,7 +62,7 @@ RUN apk update && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
     echo "Installing Java" && \
-    URL="https://cdn.azul.com/zulu/bin/zulu11.62.17-ca-jdk11.0.18-linux_musl_${MACHINE}.tar.gz" && \
+    URL="https://cdn.azul.com/zulu/bin/zulu11.64.19-ca-jdk11.0.19-linux_musl_${MACHINE}.tar.gz" && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
     ln -s zulu* java && \

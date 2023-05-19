@@ -2,13 +2,15 @@
 
 This repository provides an image for use with [podman][podman], Docker, and
 similar systems with the required tools to build [CoreMedia][coremedia] Content
-Cloud 11, CoreMedia Content Cloud 10, CMS-9, and CoreMedia Live Context 3
-workspaces. Supports platform versions range from 17nm to 23nm.
+Cloud 11, Content Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
+Supports platform versions range from 17nm to 23nm.
 
 Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively.
 
-Ready to use examples for some CI environments are also included for unchanged
-integration with platform workspaces without customizations.
+Ready to use examples for some CI environments are also included. They are
+meant for unchanged integration with platform workspaces in their state without
+any customizations. Thus they should form a good starting point for real world
+projects.
 
 The home for the sources to create the image lives at [GitHub][github] with a
 mirror at [GitLab][gitlab].
@@ -42,14 +44,14 @@ We like to support different hardware architectures where appropriate.
 ## Availability
 
 This container can be used via the canonical name `provocon/coremedia-build`.
-The tag `latest` should be expected to usable for the latest release by
+The tag `latest` should be expected to be usable for the latest release by
 [CoreMedia][coremedia].
 
 Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
 is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-11-2301.
+The latest Tag works with - at least again - CMCC-11-2304.
 
 Unpublished, daily builds are available from the [GitHub][github] and
 [GitLab][gitlab] project registries.
@@ -115,14 +117,14 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2207.3 .
-docker build -t provocon/coremedia-build:2207 .
+docker build -t provocon/coremedia-build:2304.1 .
+docker build -t provocon/coremedia-build:2304 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2207.3
-docker push provocon/coremedia-build:2207
+docker push provocon/coremedia-build:2304.1
+docker push provocon/coremedia-build:2304
 docker push provocon/coremedia-build:latest
 ```
 
@@ -134,8 +136,8 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2207.3 dockerPush
-./gradlew -Ptag=2207   dockerPush
+./gradlew -Ptag=2304.1 dockerPush
+./gradlew -Ptag=2304   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
 
@@ -148,12 +150,12 @@ Test the generated resulting container with
 
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
-Client:
- Version:           20.10.20
+lient:
+ Version:           20.10.24
  API version:       1.41
- Go version:        go1.18.7
- Git commit:        9fdeb9c
- Built:             Tue Oct 18 18:14:26 2022
+ Go version:        go1.19.7
+ Git commit:        297e128
+ Built:             Tue Apr  4 18:17:06 2023
  OS/Arch:           linux/amd64
  Context:           default
  Experimental:      true
@@ -161,16 +163,16 @@ Client:
 
 ```
 $ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
-github.com/docker/buildx v0.9.1 ed00243a0ce2a0aee75311b06e32d33b44729689
+github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
 ```
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.8.8 (4c87b05d9aedce574290d1acc98575ed5eb6cd39)
 Maven home: /usr/local/maven
-Java version: 11.0.18, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.62.17-ca-jdk11.0.18-linux_musl_x64
+Java version: 11.0.19, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.64.19-ca-jdk11.0.19-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-19-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.10.0-21-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
@@ -180,8 +182,8 @@ Sencha Cmd v7.6.0.87
 ```
 
 ```
-$ docker run --name docker --rm -it --entrypoint=node provocon/coremedia-build -v
-v16.19.1
+$ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
+v18.16.0
 ```
 
 To call the container image use
