@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2022 Martin Goellnitz.
+# Copyright 2022-2023 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@
 #
 OUTPUT_FILE=npmrc
 function usage {
-   echo "Usage: $MYNAME [-o host] [filter]"
-   echo ""
-   echo "  -h         This help message"
-   echo "  -o file    File to place results in - default ${OUTPUT_FILE}"
-   echo "  -u user    GitHub user to log in - default ${GITHUB_COM_USER}"
-   echo "  -t token   Above user's token to log in - default ${GITHUB_COM_TOKEN}"
-   echo ""
+   echo "Usage: $MYNAME [-o host] [filter]" 1>&2
+   echo "" 1>&2
+   echo "  -h         This help message" 1>&2
+   echo "  -o file    File to place results in - default ${OUTPUT_FILE}" 1>&2
+   echo "  -u user    GitHub user to log in - default ${GITHUB_COM_USER}" 1>&2
+   echo "  -t token   Above user's token to log in - default ${GITHUB_COM_TOKEN}" 1>&2
+   echo "" 1>&2
    exit
 }
 
@@ -33,26 +33,26 @@ if [ -z "$(which jq)" ] ; then
   exit
 fi
 
-PSTART=`echo $1|sed -e 's/^\(.\).*/\1/g'`
-while [ "$PSTART" = "-" ] ; do
-  if [ "$1" = "-h" ] ; then
-    usage
-  fi
-  if [ "$1" = "-o" ] ; then
-    shift
-    OUTPUT_FILE=$1
-  fi
-  if [ "$1" = "-u" ] ; then
-    shift
-    GITHUB_COM_USER=$1
-  fi
-  if [ "$1" = "-t" ] ; then
-    shift
-    GITHUB_COM_TOKEN=$1
-  fi
-  shift
-  PSTART=`echo $1|sed -e 's/^\(.\).*/\1/g'`
+while getopts "ho:u:t:" opt ; do
+  case "${opt}" in
+    h)
+      usage
+      ;;
+    o)
+      OUTPUT_FILE=$OPTARG
+      ;;
+    u)
+      GITHUB_COM_USER=$OPTARG
+      ;;
+    t)
+      GITHUB_COM_TOKEN=$OPTARG
+      ;;
+    *)
+      usage
+      ;;
+  esac
 done
+shift $((OPTIND-1))
 
 if [ -z "$GITHUB_COM_USER" ] ; then
   usage
