@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2023 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
 FROM docker:20.10
 
-ARG MAVEN_VERSION=3.8.8
-ARG MAVEN_SHA=332088670d14fa9ff346e6858ca0acca304666596fec86eea89253bd496d3c90deae2be5091be199f48e09d46cec817c6419d5161fb4ee37871503f472765d00
+ARG MAVEN_VERSION=3.9.5
+ARG MAVEN_SHA=4810523ba025104106567d8a15a8aa19db35068c8c8be19e30b219a1d7e83bcab96124bf86dc424b1cd3c5edba25d69ec0b31751c136f88975d15406cab3842b
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
-ARG HELM_VERSION=3.7.2
+ARG HELM_VERSION=3.13.0
 ARG SENCHA_VERSION=7.6.0.87
-ARG PNPM_VERSION=8.1.1
+ARG PNPM_VERSION=8.8.0
 ARG MAINTAINER='PROVOCON https://github.com/provocon/'
 
 LABEL maintainer="$MAINTAINER"
