@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2023 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ ARG HELM_VERSION=3.13.0
 ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=8.8.0
 ARG MAINTAINER='PROVOCON https://github.com/provocon/'
+ARG JDK_VERSION=11.0.21
+ARG AZUL_VERSION=11.68.17
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
@@ -45,6 +47,7 @@ WORKDIR /usr/local
 
 # The tools cosign, xz, zip, openssh etc are helpers for common CI usages
 RUN apk update && \
+    apk upgrade && \
     apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client font-noto gnupg nodejs npm libxext libxrender libxtst libxi cosign && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
@@ -62,7 +65,7 @@ RUN apk update && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
     echo "Installing Java" && \
-    URL="https://cdn.azul.com/zulu/bin/zulu11.64.19-ca-jdk11.0.19-linux_musl_${MACHINE}.tar.gz" && \
+    URL="https://cdn.azul.com/zulu/bin/zulu$AZUL_VERSION-ca-jdk$JDK_VERSION-linux_musl_$MACHINE.tar.gz" && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
     ln -s zulu* java && \
