@@ -50,8 +50,9 @@ The tag `latest` should be expected to be usable for the latest release by
 Tags are named after the first release for which the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
-is the first release for CMCC-10, which can be used at least up to CMCC-10-2004.
-The latest Tag works with - at least again - CMCC-11-2307.
+is the first release for CMCC-10, which can be used at least up to
+CMCC-10-2004. The latest Tag works with - at least again - CMCC-11-2310
+starting from CMCC-11-2307.
 
 Unpublished, daily builds are available from the [GitHub][github] and
 [GitLab][gitlab] project registries.
@@ -167,9 +168,10 @@ github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
 ```
 
 ```
-$ Apache Maven 3.9.5 (57804ffe001d7215b5e7bcb531cf83df38f93546)
+$ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
+Apache Maven 3.9.5 (57804ffe001d7215b5e7bcb531cf83df38f93546)
 Maven home: /usr/local/maven
-Java version: 11.0.19, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.64.19-ca-jdk11.0.19-linux_musl_x64
+Java version: 11.0.21, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.68.17-ca-jdk11.0.21-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "5.10.0-25-amd64", arch: "amd64", family: "unix"
 ```
