@@ -79,12 +79,18 @@ So, with [GitLab CI][gitlabci] and [GitHub Actions][actions] the steps are
 ### Adding files
 
 * `workspace-configuration/maven-settings.xml`
-* `.gitlab-ci.yml`
+
+For [GitLab CI][gitlabci]:
+
+* `.github/workflows/build.yml`
+
+[GitHub Actions][actions]:
+
 
 ### Adding secrets
 
-These values have to be added as CI variables for GitLab or action secrets for
-GitHub respectively.
+These values have to be added as CI variables for [GitLab CI][gitlabci] or 
+action secrets for [GitHub Actions][actions] respectively.
 
 CoreMedia Maven Artifacts Repository User and Password:
 
@@ -118,13 +124,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2307.1 .
+docker build -t provocon/coremedia-build:2307.2 .
 docker build -t provocon/coremedia-build:2307 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2307.1
+docker push provocon/coremedia-build:2307.2
 docker push provocon/coremedia-build:2307
 docker push provocon/coremedia-build:latest
 ```
@@ -137,7 +143,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2307.1 dockerPush
+./gradlew -Ptag=2307.2 dockerPush
 ./gradlew -Ptag=2307   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
