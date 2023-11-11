@@ -1,0 +1,100 @@
+# 
+# Copyright 2023 Martin Goellnitz
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Example starting point for a GitHub build file for CoreMedia CMCC workspaces
+#
+# Relies on the following action secrets to be set:
+#   CM_MAVEN_USER
+#   CM_MAVEN_PASSWORD
+#   NPMRC
+#
+name: Build CMCC
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  images:
+    runs-on: provocon
+    container:
+      image: provocon/coremedia-build:latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Cache local repositories
+      uses: actions/cache@v3
+      with:
+        path: ~/repository
+        key: cmcc11
+        restore-keys: cmcc11
+    - name: Configure Workspace
+      run: |
+        mkdir -p ~/.m2 && cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
+        mkdir -p ~/repository
+        repoJars=$(find ~/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
+    - name: Prepare Version Information
+      run: |
+        sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
+        BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
+        for pf in $(grep -l appRoot $(find -name "pom.xml")) ; do
+          sed -i "s/appRoot.$/appRoot><creationTime>$BUILD_DATE<\/creationTime>/g" $pf
+        done
+        find -name pom.xml -exec \
+          sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
+        VERSION_AFTER=$(echo "${{ github.ref_name }}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
+        VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
+        VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
+        echo "$BUILD_DATE: $VERSION_BEFORE -> $VERSION_AFTER"
+        if [ "$VERSION_BEFORE" = "$VERSION_AFTER" ] ; then
+          find -name pom.xml -exec sed -i "s/version.$VERSION_BEFORE..version/version\\>$VERSION_AFTER\\<\\/version/" {} \;
+          find -name pom.xml -exec sed -i "s/\(<cm.[a-z\-]*.bp.version>\)1-SNAPSHOT\(<\/.*>\)/\1$VERSION_AFTER\2/g" {} \;
+        fi
+    - name: Build Artifacts
+      env:
+        CM_MAVEN_USER: ${{ secrets.CM_MAVEN_USER }}
+        CM_MAVEN_PASSWORD: ${{ secrets.CM_MAVEN_PASSWORD }}
+      run: |
+        export CI_PROJECT_DIR=~
+        mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
+        -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
+        -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
+        -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
+        docker images
+
+  studio:
+    runs-on: provocon
+    container:
+      image: provocon/coremedia-build:latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Cache local repositories
+      uses: actions/cache@v3
+      with:
+        path: .pnpm-store
+        key: cmcc11-studio-client
+        restore-keys: cmcc11-studio-client
+    - name: Build Studio Client
+      working-directory: apps/studio-client
+      run: |
+        echo "${{ secrets.NPMRC }}" > .npmrc
+        export CI=true
+        pnpm install --no-frozen-lockfile
+        pnpm -r build
+        pnpm -r package
+        DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
+        rm -rf node_modules
+        docker images

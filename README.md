@@ -3,7 +3,7 @@
 This repository provides an image for use with [podman][podman], Docker, and
 similar systems with the required tools to build [CoreMedia][coremedia] Content
 Cloud 11, Content Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
-Supports platform versions range from 17nm to 23nm.
+Supported platform versions range from 17nm to 23nm.
 
 Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively.
 
@@ -24,10 +24,10 @@ for feedback.
 
 ## Goals
 
-This image is intended for use in container based CI systems like the
-[GitLab CI][gitlabci] or [GitHub Actions][actions]. Example starting points are
-included with this repository, which work within the bounds of the public
-shared runner limitations.
+This image is intended for use in container based CI systems like
+[Forgejo Actions][forgejo], [GitLab CI][gitlabci], or [GitHub Actions][actions].
+Example starting points are included with this repository, which work within
+the bounds of the public shared runner limitations.
 
 Also, some common tools for additional preparation steps are included like
 
@@ -74,32 +74,49 @@ Cloud, e.g.
 mvn install -Dwebdriver.chrome.driver=/usr/bin/chromedriver -Dwebdriver.chrome.verboseLogging=true -DjooUnitWebDriverBrowserArguments=--no-sandbox,--disable-dev-shm-usage
 ```
 
-So, with [GitLab CI][gitlabci] and [GitHub Actions][actions] the steps are
+So, with [Forgejo Actions][forgejo], [GitLab CI][gitlabci], or
+[GitHub Actions][actions] the steps are
 
 ### Adding files
 
 * `workspace-configuration/maven-settings.xml`
+* `workspace-configuration/npm-registry-login.sh`
 
-For [GitLab CI][gitlabci]:
+[Forgejo Actions][forgejo]:
+
+* `.forgejo/workflows/build.yml`
+
+[GitHub Actions][actions]:
 
 * `.github/workflows/build.yml`
 
-[GitHub Actions][actions]:
+[GitLab CI][gitlabci]:
+
+* `.github/workflows/build.yml`
 
 
 ### Adding secrets
 
-These values have to be added as CI variables for [GitLab CI][gitlabci] or 
-action secrets for [GitHub Actions][actions] respectively.
+These values have to be added as CI variables for [GitLab CI][gitlabci] and
+as action secrets for [Forgejo Actions][forgejo] and [GitHub Actions][actions]
+respectively.
 
 CoreMedia Maven Artifacts Repository User and Password:
 
 * `CM_MAVEN_USER`
 * `CM_MAVEN_PASSWORD`
 
-CoreMedia NPM Registry Token:
+CoreMedia NPM Registry Token for [GitLab CI][gitlabci] :
 
 * `NPMRC_TOKEN`
+
+Full NPM RC-File for [Forgejo Actions][forgejo] and [GitHub Actions][actions]
+
+* `NPMRC`
+
+The NPMRC raw data can be obtained by using the login script provided in the
+`workspace-configuration` folder as indicated above. You will need to update
+this value every few months.
 
 Optionally add Maven Options
 
@@ -206,6 +223,7 @@ docker run -it --rm provocon/coremedia-build /bin/bash
 [npm]: https://www.npmjs.com/
 [gitlabci]: https://docs.gitlab.com/ee/ci/
 [actions]: https://github.com/features/actions
+[forgejo]: https://forgejo.org/docs/latest/user/actions/
 [podman]: https://podman.io/
 [dockerhub]: https://hub.docker.com/
 [issues]: https://github.com/provocon/coremedia-build-docker/issues
