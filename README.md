@@ -141,13 +141,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2307.2 .
+docker build -t provocon/coremedia-build:2307.3 .
 docker build -t provocon/coremedia-build:2307 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2307.2
+docker push provocon/coremedia-build:2307.3
 docker push provocon/coremedia-build:2307
 docker push provocon/coremedia-build:latest
 ```
@@ -160,7 +160,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2307.2 dockerPush
+./gradlew -Ptag=2307.3 dockerPush
 ./gradlew -Ptag=2307   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
@@ -192,7 +192,7 @@ github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.9.5 (57804ffe001d7215b5e7bcb531cf83df38f93546)
+Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
 Maven home: /usr/local/maven
 Java version: 11.0.21, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.68.17-ca-jdk11.0.21-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
