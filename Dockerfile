@@ -77,6 +77,7 @@ RUN apk update && \
                -dir /usr/local/sencha/$SENCHA_VERSION && \
     mkdir -p sencha/repo && \
     chmod 777 sencha/repo && \
+    ln -s zulu11* /usr/local/sencha/$SENCHA_VERSION/jre && \
     ln -s /usr/local/sencha/sencha-$SENCHA_VERSION /usr/local/bin/sencha && \
     rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
     ln -s $(which node) /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
