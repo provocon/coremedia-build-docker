@@ -1,19 +1,19 @@
 # CoreMedia Build Image
 
-This repository provides an image for use with [podman][podman], Docker, and
-similar systems with the required tools to build [CoreMedia][coremedia] Content
-Cloud 11, Content Cloud 10, CMS-9, and CoreMedia Live Context 3 workspaces.
-Supported platform versions range from 17nm to 23nm.
+This repository provides an image with the required tools to build
+[CoreMedia][coremedia] Content Cloud 11, Content Cloud 10, CMS-9, and CoreMedia
+Live Context 3 workspaces for use with [podman][podman], Docker, and
+similar systems. Supported platform versions range from 17nm to 23nm.
 
-Images started to be available for AMD64/x86_64 and ARM64/Aarch64 respectively.
+Images started to be available for AMD64/x86_64 and ARM64/Aarch64 with CMCC-11.
 
 Ready to use examples for some CI environments are also included. They are
 meant for unchanged integration with platform workspaces in their state without
 any customizations. Thus they should form a good starting point for real world
 projects.
 
-The home for the sources to create the image lives at [GitHub][github] with a
-mirror at [GitLab][gitlab].
+The home for the sources to create the image lives at [Codeberg][codeberg] with
+mirrors at [GitHub][github] and [GitLab][gitlab].
 
 
 ## Feedback
@@ -43,19 +43,24 @@ We like to support different hardware architectures where appropriate.
 
 ## Availability
 
-This container can be used via the canonical name `provocon/coremedia-build`.
+This image can be used via the canonical name `provocon/coremedia-build`.
 The tag `latest` should be expected to be usable for the latest release by
 [CoreMedia][coremedia].
 
-Tags are named after the first release for which the implemented changes are
+Tags are named after the first release where the implemented changes are
 required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
-`1904` is the last release intended for CMS-9 and LiveContext 3, while `1907`
-is the first release for CMCC-10, which can be used at least up to
-CMCC-10-2004. The latest Tag works with - at least again - CMCC-11-2310
+`1904` is the last release intended for CMS-9 and LiveContext 3. `1907`
+was the first release for CMCC-10, which can be used at least up to
+CMCC-10-2004 and so on.
+
+* `2110` is the current release to work with CMCC-10.
+* `2307` is the current release to work with CMCC-11.
+
+The latest Tag works with - at least again - CMCC-11-2310
 starting from CMCC-11-2307.
 
-Unpublished, daily builds are available from the [GitHub][github] and
-[GitLab][gitlab] project registries.
+Unpublished, daily builds are available from the [Codeberg][codeberg],
+[GitHub][github] and [GitLab][gitlab] project registries.
 
 
 ## Usage
@@ -63,9 +68,10 @@ Unpublished, daily builds are available from the [GitHub][github] and
 See the `examples/` directory with usage examples and don't forget the
 [Maven][maven] and [NPM][npm] registry setup.
 
-Examples for builds with [GitLab CI][gitlabci] and [GitHub Actions][actions]
-will need the additional files in `examples/workspace-configuration` and
-a personal `npmrc` needs to be created through `npm-registry-login.sh`.
+Examples for builds with [Forgejo Actions][forgejo], [GitLab CI][gitlabci] and
+[GitHub Actions][actions] will need the additional files in
+`examples/workspace-configuration` and a personal `npmrc` needs to be created
+through `npm-registry-login.sh`.
 
 Perhaps you still need to mind some parameters when building CoreMedia Content
 Cloud, e.g.
@@ -141,13 +147,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2307.3 .
+docker build -t provocon/coremedia-build:2307.4 .
 docker build -t provocon/coremedia-build:2307 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2307.3
+docker push provocon/coremedia-build:2307.4
 docker push provocon/coremedia-build:2307
 docker push provocon/coremedia-build:latest
 ```
@@ -160,7 +166,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2307.3 dockerPush
+./gradlew -Ptag=2307.4 dockerPush
 ./gradlew -Ptag=2307   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
@@ -179,8 +185,8 @@ Client:
  API version:       1.41
  Go version:        go1.19.7
  Git commit:        297e128
- Built:             Tue Apr  4 18:17:06 2023
- OS/Arch:           linux/amd64
+ Built:             Tue Apr  4 18:15:42 2023
+ OS/Arch:           linux/arm64
  Context:           default
  Experimental:      true
 ```
@@ -207,7 +213,7 @@ Sencha Cmd v7.6.0.87
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v18.17.1
+v18.18.2
 ```
 
 To call the container image use
@@ -228,4 +234,5 @@ docker run -it --rm provocon/coremedia-build /bin/bash
 [dockerhub]: https://hub.docker.com/
 [issues]: https://github.com/provocon/coremedia-build-docker/issues
 [github]: https://github.com/provocon/coremedia-build-docker
+[codeberg]: https://codeberg.org/provocon/coremedia-build-image
 [gitlab]: https://gitlab.com/provocon/coremedia-build-docker
