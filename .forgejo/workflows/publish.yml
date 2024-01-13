@@ -28,7 +28,7 @@ jobs:
 
     runs-on: provocon
     container:
-      image: provocon/coremedia-build:latest
+      image: debian:stable-slim
     permissions:
       contents: read
       packages: write
@@ -37,6 +37,10 @@ jobs:
       id-token: write
 
     steps:
+      # Docker and Node.js are not part of the base image
+      - name: Prepare Tools
+        run: apt update ; apt install -yq nodejs docker.io curl
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
