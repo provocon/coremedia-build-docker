@@ -20,12 +20,11 @@ ARG MAVEN_VERSION=3.9.6
 ARG MAVEN_SHA=706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386483b506b3a4e8a03ac8611bae96395fd5eec15f50d3013d5deed6d1ee18224
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
-ARG HELM_VERSION=3.13.3
+ARG HELM_VERSION=3.14.0
 ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=8.14.1
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
-ARG JDK_VERSION=11.0.21
-ARG AZUL_VERSION=11.68.17
+ARG JDK_VERSIONS="amd64:11.0.22:11.70.15\narm64:11.0.21:11.68.17"
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
@@ -64,7 +63,9 @@ RUN apk update && \
     curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
-    echo "Installing Java" && \
+    JDK_VERSION=$(echo -e $JDK_VERSIONS|grep $ARCH|cut -d ':' -f 2) && \
+    AZUL_VERSION=$(echo -e $JDK_VERSIONS|grep $ARCH|cut -d ':' -f 3) && \
+    echo "Installing Java $JDK_VERSION / $AZUL_VERSION" && \
     URL="https://cdn.azul.com/zulu/bin/zulu$AZUL_VERSION-ca-jdk$JDK_VERSION-linux_musl_$MACHINE.tar.gz" && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
@@ -77,7 +78,7 @@ RUN apk update && \
                -dir /usr/local/sencha/$SENCHA_VERSION && \
     mkdir -p sencha/repo && \
     chmod 777 sencha/repo && \
-    ln -s zulu11* /usr/local/sencha/$SENCHA_VERSION/jre && \
+    ln -s /usr/local/zulu11* /usr/local/sencha/$SENCHA_VERSION/jre && \
     ln -s /usr/local/sencha/sencha-$SENCHA_VERSION /usr/local/bin/sencha && \
     rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
     ln -s $(which node) /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \

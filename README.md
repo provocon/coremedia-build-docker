@@ -185,8 +185,8 @@ Client:
  API version:       1.41
  Go version:        go1.19.7
  Git commit:        297e128
- Built:             Tue Apr  4 18:15:42 2023
- OS/Arch:           linux/arm64
+ Built:             Tue Apr  4 18:17:06 2023
+ OS/Arch:           linux/amd64
  Context:           default
  Experimental:      true
 ```
@@ -200,7 +200,7 @@ github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
 Maven home: /usr/local/maven
-Java version: 11.0.21, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.68.17-ca-jdk11.0.21-linux_musl_x64
+Java version: 11.0.22, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.70.15-ca-jdk11.0.22-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "5.10.0-25-amd64", arch: "amd64", family: "unix"
 ```
@@ -214,6 +214,10 @@ Sencha Cmd v7.6.0.87
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
 v18.18.2
+```
+
+$ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
+version.BuildInfo{Version:"v3.14.0", GitCommit:"3fc9f4b2638e76f26739cd77c7017139be81d0ea", GitTreeState:"clean", GoVersion:"go1.21.5"}
 ```
 
 To call the container image use
