@@ -24,7 +24,8 @@ ARG HELM_VERSION=3.14.0
 ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=8.14.1
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
-ARG JDK_VERSIONS="amd64:11.0.22:11.70.15\narm64:11.0.21:11.68.17"
+ARG JDK_VERSIONS="amd64:17.0.10:17.48.15\narm64:17.0.9:17.46.19"
+ARG JDK11_VERSIONS="amd64:11.0.22:11.70.15\narm64:11.0.21:11.68.17"
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
@@ -70,6 +71,12 @@ RUN apk update && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
     ln -s zulu* java && \
+    JDK11_VERSION=$(echo -e $JDK11_VERSIONS|grep $ARCH|cut -d ':' -f 2) && \
+    AZUL11_VERSION=$(echo -e $JDK11_VERSIONS|grep $ARCH|cut -d ':' -f 3) && \
+    echo "Installing Java $JDK11_VERSION / $AZUL11_VERSION" && \
+    URL="https://cdn.azul.com/zulu/bin/zulu$AZUL11_VERSION-ca-jdk$JDK11_VERSION-linux_musl_$MACHINE.tar.gz" && \
+    curl -Lo java.tgz $URL 2> /dev/null && \
+    tar xzf java.tgz && \
     echo "Installing SenchaCmd" && \
     URL="http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip" && \
     curl -Lo sencha.zip $URL 2> /dev/null && \
