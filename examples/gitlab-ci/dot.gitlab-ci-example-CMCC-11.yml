@@ -25,7 +25,7 @@
 # CoreMedia NPM Registry Token
 #   NPMRC_TOKEN
 #
-image: provocon/coremedia-build:latest
+image: provocon/coremedia-build:2307.4
 
 # Because $envName-Deployments are manual jobs, they could be executed without
 # a prior build because in almost any cases docker container were present and
@@ -55,7 +55,7 @@ Build:
   # Cache downloaded dependencies and plugins between builds.
   # To keep cache across branches add key.
   cache:
-    key: "cmcc-12"
+    key: "cmcc-11"
     paths:
       - .pnpm-store
       - repository
@@ -64,6 +64,10 @@ Build:
   services:
     - docker:20.10-dind
   script:
+    # Pre-fill docker images to use locally with authenticated requests:
+    # - echo "Login in as _${DH_REGISTRY_USER}_"
+    # - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
+    # - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
     # Cache preparation and check
@@ -114,7 +118,7 @@ Build:
 Push:
   stage: deliver
   cache:
-    key: "cmcc-12"
+    key: "cmcc-11"
     paths:
       - .pnpm-store
       - repository
@@ -152,7 +156,7 @@ Push:
       fi
     # Pre-fill docker images to use locally with authenticated requests:
     - docker login -u $DH_REGISTRY_USER -p $DH_REGISTRY_PASSWORD
-    - docker pull 'coremedia/java-application-base:2.1-cm-17.0-corretto-jre'
+    - docker pull 'coremedia/java-application-base:2.4.4-corretto-11'
     #
     # studio client has to be build separately
     - cd apps/studio-client
@@ -164,7 +168,7 @@ Push:
     - pnpm install --no-frozen-lockfile
     - pnpm -r build
     - pnpm -r package
-    - DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
+    - DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:2307.4'
     - pnpm store prune
     - cd ../..
     # Log into target registry

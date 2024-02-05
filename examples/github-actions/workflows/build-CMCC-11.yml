@@ -1,5 +1,5 @@
 # 
-# Copyright 2023-2024 Martin Goellnitz
+# Copyright 2022-2024 Martin Goellnitz
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,18 +28,21 @@ on:
 
 jobs:
   images:
-    runs-on: provocon
-    container:
-      image: provocon/coremedia-build:latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'adopt'
     - name: Cache local repositories
       uses: actions/cache@v3
       with:
         path: ~/repository
-        key: cmcc12
-        restore-keys: cmcc12
+        key: cmcc11
+        restore-keys: cmcc11
     - name: Configure Workspace
       run: |
         mkdir -p ~/.m2 && cp workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -76,17 +79,17 @@ jobs:
         docker images
 
   studio:
-    runs-on: provocon
+    runs-on: ubuntu-latest
     container:
-      image: provocon/coremedia-build:latest
+      image: provocon/coremedia-build:2307.4
     steps:
     - uses: actions/checkout@v4
     - name: Cache local repositories
       uses: actions/cache@v3
       with:
         path: .pnpm-store
-        key: cmcc12-studio-client
-        restore-keys: cmcc12-studio-client
+        key: cmcc11-studio-client
+        restore-keys: cmcc11-studio-client
     - name: Build Studio Client
       working-directory: apps/studio-client
       run: |
@@ -95,6 +98,6 @@ jobs:
         pnpm install --no-frozen-lockfile
         pnpm -r build
         pnpm -r package
-        DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
+        DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:2307.4'
         rm -rf node_modules
         docker images
