@@ -55,6 +55,7 @@ CMCC-10-2004 and so on.
 
 * `2110` is the current release to work with CMCC-10.
 * `2307` is the current release to work with CMCC-11.
+* `2401` is the current release to work with CMCC-12.
 
 The latest Tag works with - at least again - CMCC-11-2310
 starting from CMCC-11-2307.
@@ -147,14 +148,14 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2307.4 .
-docker build -t provocon/coremedia-build:2307 .
+docker build -t provocon/coremedia-build:2401.1 .
+docker build -t provocon/coremedia-build:2401 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2307.4
-docker push provocon/coremedia-build:2307
+docker push provocon/coremedia-build:2401.1
+docker push provocon/coremedia-build:2401
 docker push provocon/coremedia-build:latest
 ```
 
@@ -166,8 +167,8 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2307.4 dockerPush
-./gradlew -Ptag=2307   dockerPush
+./gradlew -Ptag=2401.1 dockerPush
+./gradlew -Ptag=2401   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
 
@@ -200,7 +201,7 @@ github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
 Maven home: /usr/local/maven
-Java version: 11.0.22, vendor: Azul Systems, Inc., runtime: /usr/local/zulu11.70.15-ca-jdk11.0.22-linux_musl_x64
+Java version: 17.0.10, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.48.15-ca-jdk17.0.10-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "5.10.0-25-amd64", arch: "amd64", family: "unix"
 ```
