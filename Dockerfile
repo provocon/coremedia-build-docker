@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
-FROM docker:20.10
+FROM docker:25.0
 
 ARG MAVEN_VERSION=3.9.6
 ARG MAVEN_SHA=706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386483b506b3a4e8a03ac8611bae96395fd5eec15f50d3013d5deed6d1ee18224

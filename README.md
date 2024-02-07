@@ -181,19 +181,18 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           20.10.24
- API version:       1.41
- Go version:        go1.19.7
- Git commit:        297e128
- Built:             Tue Apr  4 18:17:06 2023
+ Version:           25.0.3
+ API version:       1.44
+ Go version:        go1.21.6
+ Git commit:        4debf41
+ Built:             Tue Feb  6 21:13:00 2024
  OS/Arch:           linux/amd64
  Context:           default
- Experimental:      true
 ```
 
 ```
 $ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
-github.com/docker/buildx v0.10.4 c513d34049e499c53468deac6c4267ee72948f02
+github.com/docker/buildx v0.12.1 30feaa1a915b869ebc2eea6328624b49facd4bfb
 ```
 
 ```
@@ -213,7 +212,7 @@ Sencha Cmd v7.6.0.87
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v18.18.2
+v20.11.0
 ```
 
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
