@@ -1,7 +1,7 @@
 # CoreMedia Build Image
 
 This repository provides an image with the required tools to build
-[CoreMedia][coremedia] Content Cloud 11, Content Cloud 10, CMS-9, and CoreMedia
+[CoreMedia][coremedia] Content Cloud 12, 11, 10, CoreMedia CMS-9, and CoreMedia
 Live Context 3 workspaces for use with [podman][podman], Docker, and
 similar systems. Supported platform versions range from 17nm to 23nm.
 
@@ -57,8 +57,7 @@ CMCC-10-2004 and so on.
 * `2307` is the current release to work with CMCC-11.
 * `2401` is the current release to work with CMCC-12.
 
-The latest Tag works with - at least again - CMCC-11-2310
-starting from CMCC-11-2307.
+The latest Tag works with - at least again - CMCC-12-2401.
 
 Unpublished, daily builds are available from the [Codeberg][codeberg],
 [GitHub][github] and [GitLab][gitlab] project registries.
