@@ -215,6 +215,7 @@ $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
 v20.11.0
 ```
 
+```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
 version.BuildInfo{Version:"v3.14.0", GitCommit:"3fc9f4b2638e76f26739cd77c7017139be81d0ea", GitTreeState:"clean", GoVersion:"go1.21.5"}
 ```
