@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
-FROM docker:25.0
+FROM docker:26.0
 
 ARG MAVEN_VERSION=3.9.6
 ARG MAVEN_SHA=706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386483b506b3a4e8a03ac8611bae96395fd5eec15f50d3013d5deed6d1ee18224
@@ -22,7 +22,7 @@ ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
 ARG HELM_VERSION=3.14.0
 ARG SENCHA_VERSION=7.6.0.87
-ARG PNPM_VERSION=8.14.1
+ARG PNPM_VERSION=8.15.7
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
 ARG JDK_VERSIONS="amd64:17.0.11:17.50.19\narm64:17.0.11:17.50.19"
 ARG JDK11_VERSIONS="amd64:11.0.23:11.72.19\narm64:11.0.23:11.72.19"
