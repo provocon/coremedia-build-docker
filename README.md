@@ -55,9 +55,9 @@ CMCC-10-2004 and so on.
 
 * `2110` is the current release to work with CMCC-10.
 * `2307` is the current release to work with CMCC-11.
-* `2401` is the current release to work with CMCC-12.
+* `2404` is the current release to work with CMCC-12.
 
-The latest Tag works with - at least again - CMCC-12-2401.
+The latest Tag works with - at least again - CMCC-12-2404.
 
 Unpublished, daily builds are available from the [Codeberg][codeberg],
 [GitHub][github] and [GitLab][gitlab] project registries.
@@ -147,14 +147,14 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2401.1 .
-docker build -t provocon/coremedia-build:2401 .
+docker build -t provocon/coremedia-build:2404.1 .
+docker build -t provocon/coremedia-build:2404 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2401.1
-docker push provocon/coremedia-build:2401
+docker push provocon/coremedia-build:2404.1
+docker push provocon/coremedia-build:2404
 docker push provocon/coremedia-build:latest
 ```
 
@@ -166,8 +166,8 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2401.1 dockerPush
-./gradlew -Ptag=2401   dockerPush
+./gradlew -Ptag=2404.1 dockerPush
+./gradlew -Ptag=2404   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
 
@@ -181,27 +181,27 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           25.0.3
- API version:       1.44
- Go version:        go1.21.6
- Git commit:        4debf41
- Built:             Tue Feb  6 21:13:00 2024
+ Version:           26.0.2
+ API version:       1.45
+ Go version:        go1.21.9
+ Git commit:        3c863ff
+ Built:             Thu Apr 18 16:26:34 2024
  OS/Arch:           linux/amd64
  Context:           default
 ```
 
 ```
 $ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
-github.com/docker/buildx v0.12.1 30feaa1a915b869ebc2eea6328624b49facd4bfb
+github.com/docker/buildx v0.14.0 171fcbeb69d67c90ba7f44f41a9e418f6a6ec1da
 ```
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
 Maven home: /usr/local/maven
-Java version: 17.0.10, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.48.15-ca-jdk17.0.10-linux_musl_x64
+Java version: 17.0.11, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.50.19-ca-jdk17.0.11-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "5.10.0-25-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "6.1.0-18-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
@@ -212,7 +212,7 @@ Sencha Cmd v7.6.0.87
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v20.11.0
+v20.12.1
 ```
 
 ```
