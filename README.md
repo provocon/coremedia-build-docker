@@ -205,12 +205,6 @@ OS name: "linux", version: "6.1.0-18-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
-$ docker run --name sencha --rm -it --entrypoint=sencha provocon/coremedia-build which
-Sencha Cmd v7.6.0.87
-/usr/local/sencha/7.6.0.87/
-```
-
-```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
 v20.12.1
 ```
@@ -226,7 +220,6 @@ To call the container image use
 docker run -it --rm provocon/coremedia-build /bin/bash
 ```
 
-[sencha]: https://www.sencha.com/products/extjs/cmd-download/
 [coremedia]: http://www.coremedia.com/
 [maven]: https://maven.apache.org/
 [gradle]: https://gradle.org/

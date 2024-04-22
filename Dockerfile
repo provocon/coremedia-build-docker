@@ -21,15 +21,12 @@ ARG MAVEN_SHA=706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
 ARG HELM_VERSION=3.14.0
-ARG SENCHA_VERSION=7.6.0.87
 ARG PNPM_VERSION=8.15.7
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
 ARG JDK_VERSIONS="amd64:17.0.11:17.50.19\narm64:17.0.11:17.50.19"
-ARG JDK11_VERSIONS="amd64:11.0.23:11.72.19\narm64:11.0.23:11.72.19"
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
-LABEL SenchaCmd="$SENCHA_VERSION"
 LABEL Helm="$HELM_VERSION"
 LABEL PNPM="$PNPM_VERSION"
 
@@ -38,7 +35,7 @@ ENV MAVEN_HOME /usr/local/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 ENV JAVA_HOME=/usr/local/java
 ENV PNPM_HOME=/usr/local/bin
-ENV PATH="$PATH:/usr/local/sencha:$JAVA_HOME/bin"
+ENV PATH="$PATH:$JAVA_HOME/bin"
 ENV LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8'
 ENV DISPLAY :20.0
 ENV SCREEN_GEOMETRY "1440x900x24"
@@ -71,25 +68,6 @@ RUN apk update && \
     curl -Lo java.tgz $URL 2> /dev/null && \
     tar xzf java.tgz && \
     ln -s zulu* java && \
-    JDK11_VERSION=$(echo -e $JDK11_VERSIONS|grep $ARCH|cut -d ':' -f 2) && \
-    AZUL11_VERSION=$(echo -e $JDK11_VERSIONS|grep $ARCH|cut -d ':' -f 3) && \
-    echo "Installing Java $JDK11_VERSION / $AZUL11_VERSION" && \
-    URL="https://cdn.azul.com/zulu/bin/zulu$AZUL11_VERSION-ca-jdk$JDK11_VERSION-linux_musl_$MACHINE.tar.gz" && \
-    curl -Lo java.tgz $URL 2> /dev/null && \
-    tar xzf java.tgz && \
-    echo "Installing SenchaCmd" && \
-    URL="http://cdn.sencha.com/cmd/$SENCHA_VERSION/no-jre/SenchaCmd-$SENCHA_VERSION-linux-amd64.sh.zip" && \
-    curl -Lo sencha.zip $URL 2> /dev/null && \
-    unzip sencha.zip && \
-    ./SenchaCmd-$SENCHA_VERSION-linux-amd64.sh -q -d --illegal-access=warn \
-               -dir /usr/local/sencha/$SENCHA_VERSION && \
-    mkdir -p sencha/repo && \
-    chmod 777 sencha/repo && \
-    ln -s /usr/local/zulu11* /usr/local/sencha/$SENCHA_VERSION/jre && \
-    ln -s /usr/local/sencha/sencha-$SENCHA_VERSION /usr/local/bin/sencha && \
-    rm sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
-    ln -s $(which node) /usr/local/sencha/$SENCHA_VERSION/bin/linux-x64/node/node && \
-    echo "Cleaning Up" && \
     rm -rf linux-* *.tgz *.zip *.sh java/lib/src.zip java/legal java/[mNr]* /root/.[cjn]* /var/cache/apk/*
 
 CMD ["bash"]
