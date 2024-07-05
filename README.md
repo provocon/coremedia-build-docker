@@ -48,16 +48,16 @@ The tag `latest` should be expected to be usable for the latest release by
 [CoreMedia][coremedia].
 
 Tags are named after the first release where the implemented changes are
-required. Thus, `1801` can be used for releases e.g. cms-9-1801 and onwards.
+required. Thus, `1801` e.g. can be used for releases cms-9-1801 and onwards.
 `1904` is the last release intended for CMS-9 and LiveContext 3. `1907`
 was the first release for CMCC-10, which can be used at least up to
 CMCC-10-2004 and so on.
 
 * `2110` is the current release to work with CMCC-10.
 * `2307` is the current release to work with CMCC-11.
-* `2404` is the current release to work with CMCC-12.
+* `2406` is the current release to work with CMCC-12.
 
-The latest Tag works with - at least again - CMCC-12-2404.
+The latest Tag works with - at least again - CMCC-12-2406.0.
 
 Unpublished, daily builds are available from the [Codeberg][codeberg],
 [GitHub][github] and [GitLab][gitlab] project registries.
@@ -147,14 +147,14 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2404.1 .
-docker build -t provocon/coremedia-build:2404 .
+docker build -t provocon/coremedia-build:2406.1 .
+docker build -t provocon/coremedia-build:2406 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2404.1
-docker push provocon/coremedia-build:2404
+docker push provocon/coremedia-build:2406.1
+docker push provocon/coremedia-build:2406
 docker push provocon/coremedia-build:latest
 ```
 
@@ -166,8 +166,8 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2404.1 dockerPush
-./gradlew -Ptag=2404   dockerPush
+./gradlew -Ptag=2406.1 dockerPush
+./gradlew -Ptag=2406   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
 
@@ -197,7 +197,7 @@ github.com/docker/buildx v0.14.0 171fcbeb69d67c90ba7f44f41a9e418f6a6ec1da
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)
+Apache Maven 3.9.8 (36645f6c9b5079805ea5009217e36f2cffd34256)
 Maven home: /usr/local/maven
 Java version: 17.0.11, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.50.19-ca-jdk17.0.11-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
@@ -211,7 +211,7 @@ v20.12.1
 
 ```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
-version.BuildInfo{Version:"v3.14.0", GitCommit:"3fc9f4b2638e76f26739cd77c7017139be81d0ea", GitTreeState:"clean", GoVersion:"go1.21.5"}
+version.BuildInfo{Version:"v3.15.2", GitCommit:"1a500d5625419a524fdae4b33de351cc4f58ec35", GitTreeState:"clean", GoVersion:"go1.22.4"}
 ```
 
 To call the container image use
