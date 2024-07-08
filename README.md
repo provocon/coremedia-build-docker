@@ -143,13 +143,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2406.1 .
+docker build -t provocon/coremedia-build:2406.0 .
 docker build -t provocon/coremedia-build:2406 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2406.1
+docker push provocon/coremedia-build:2406.0
 docker push provocon/coremedia-build:2406
 docker push provocon/coremedia-build:latest
 ```
@@ -162,7 +162,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2406.1 dockerPush
+./gradlew -Ptag=2406.0 dockerPush
 ./gradlew -Ptag=2406   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
