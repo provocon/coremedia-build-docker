@@ -90,7 +90,10 @@ jobs:
     - name: Build Studio Client
       working-directory: apps/studio-client
       run: |
-        echo "${{ secrets.NPMRC }}" > .npmrc
+        echo "@coremedia:registry=https://npm.coremedia.io" > ~/.npmrc
+        echo "@jangaroo:registry=https://npm.coremedia.io" >> ~/.npmrc
+        echo "//npm.coremedia.io/:_authToken=${{ secrets.NPMRC_TOKEN }}" >> ~/.npmrc
+        echo "unsafe-perm=true" >> ~/.npmrc
         export CI=true
         pnpm install --no-frozen-lockfile
         pnpm -r build

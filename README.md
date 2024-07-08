@@ -70,8 +70,8 @@ See the `examples/` directory with usage examples and don't forget the
 
 Examples for builds with [Forgejo Actions][forgejo], [GitLab CI][gitlabci] and
 [GitHub Actions][actions] will need the additional files in
-`examples/workspace-configuration` and a personal `npmrc` needs to be created
-through `npm-registry-login.sh`.
+`examples/workspace-configuration` and a personal Token für pnpm login needs to
+be created, e.g. through `npm-registry-login.sh`.
 
 Perhaps you still need to mind some parameters when building CoreMedia Content
 Cloud, e.g.
@@ -98,7 +98,7 @@ So, with [Forgejo Actions][forgejo], [GitLab CI][gitlabci], or
 
 [GitLab CI][gitlabci]:
 
-* `.github/workflows/build.yml`
+* `.gitlab-ci.yml`
 
 
 ### Adding secrets
@@ -112,15 +112,11 @@ CoreMedia Maven Artifacts Repository User and Password:
 * `CM_MAVEN_USER`
 * `CM_MAVEN_PASSWORD`
 
-CoreMedia NPM Registry Token for [GitLab CI][gitlabci] :
+CoreMedia NPM Registry Token:
 
 * `NPMRC_TOKEN`
 
-Full NPM RC-File for [Forgejo Actions][forgejo] and [GitHub Actions][actions]
-
-* `NPMRC`
-
-The NPMRC raw data can be obtained by using the login script provided in the
+The npmrcraw data can be obtained by using the login script provided in the
 `workspace-configuration` folder as indicated above. You will need to update
 this value every few months.
 

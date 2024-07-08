@@ -156,10 +156,10 @@ Push:
     #
     # studio client has to be build separately
     - cd apps/studio-client
-    - echo "@coremedia:registry=https://npm.coremedia.io" > .npmrc
-    - echo "@jangaroo:registry=https://npm.coremedia.io" >> .npmrc
-    - echo "//npm.coremedia.io/:_authToken=$NPMRC_TOKEN" >> .npmrc
-    - echo "unsafe-perm=true" >> .npmrc
+    - echo "@coremedia:registry=https://npm.coremedia.io" > ~/.npmrc
+    - echo "@jangaroo:registry=https://npm.coremedia.io" >> ~/.npmrc
+    - echo "//npm.coremedia.io/:_authToken=$NPMRC_TOKEN" >> ~/.npmrc
+    - echo "unsafe-perm=true" >> ~/.npmrc
     - CI=true
     - pnpm install --no-frozen-lockfile
     - pnpm -r build
