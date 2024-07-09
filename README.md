@@ -206,6 +206,11 @@ v20.12.1
 ```
 
 ```
+$docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
+9.4.0
+```
+
+```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
 version.BuildInfo{Version:"v3.15.2", GitCommit:"1a500d5625419a524fdae4b33de351cc4f58ec35", GitTreeState:"clean", GoVersion:"go1.22.4"}
 ```
