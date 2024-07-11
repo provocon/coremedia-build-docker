@@ -33,9 +33,10 @@ jobs:
       image: provocon/coremedia-build:2307.4
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
     - name: Cache local repositories
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/repository
         key: cmcc11
@@ -80,9 +81,10 @@ jobs:
     container:
       image: provocon/coremedia-build:2307.4
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
     - name: Cache local repositories
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .pnpm-store
         key: cmcc11-studio-client
