@@ -182,7 +182,7 @@ Push:
     # (https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
     #
     - |
-      for PART in $(grep -l default-image $(find -name "pom.xml")) ; do
+      for PART in $(grep -l default-image $(find -name "pom.xml")|grep -v global.examples) ; do
         echo "Packaging $PART"
         mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
