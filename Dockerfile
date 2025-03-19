@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2024 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2025 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ ARG MAVEN_VERSION=3.9.9
 ARG MAVEN_SHA=a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
-ARG HELM_VERSION=3.16.2
+ARG HELM_VERSION=3.17.0
 ARG PNPM_VERSION=9.8.0
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
-ARG JDK_VERSIONS="amd64:17.0.13:17.54.21\narm64:17.0.13:17.54.21"
+ARG JDK_VERSIONS="amd64:17.0.14:17.56.15\narm64:17.0.14:17.56.15"
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
