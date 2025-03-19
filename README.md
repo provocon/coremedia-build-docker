@@ -57,7 +57,7 @@ CMCC-10-2004 and so on.
 * `2307` is the current release to work with CMCC-11.
 * `2406` is the current release to work with CMCC-12.
 
-The latest Tag works with - at least again - CMCC-12-2406.0.
+The latest Tag works with - at least again - CMCC-12-2412.0.
 
 Unpublished, daily builds are available from the [Codeberg][codeberg],
 [GitHub][github] and [GitLab][gitlab] project registries.
@@ -206,7 +206,7 @@ v20.12.1
 ```
 
 ```
-$docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
+$ docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
 9.4.0
 ```
 
