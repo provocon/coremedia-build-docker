@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 #
-# Copyright 2022-2023 Martin Goellnitz.
+# Copyright 2022-2025 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 # Login into CoreMedia's NPM Registry
 #
 OUTPUT_FILE=npmrc
-function usage {
+usage () {
    echo "Usage: $MYNAME [-o host] [filter]" 1>&2
    echo "" 1>&2
    echo "  -h         This help message" 1>&2
