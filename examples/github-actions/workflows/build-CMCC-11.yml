@@ -1,5 +1,5 @@
 # 
-# Copyright 2022-2024 Martin Goellnitz
+# Copyright 2022-2025 Martin Goellnitz
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ jobs:
     - name: Prepare Version Information
       run: |
         sed -i -e 's/customer.Blueprint..customer/customer>PROVOCON<\/customer/g' $(find -name "pom.xml"|grep blueprint-parent)
-        BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
+        BUILD_DATE=$(git log -n 1 --format="%aI")
         for pf in $(grep -l appRoot $(find -name "pom.xml")) ; do
           sed -i "s/appRoot.$/appRoot><creationTime>$BUILD_DATE<\/creationTime>/g" $pf
         done

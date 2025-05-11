@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2022 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2025 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ variables:
     - remoteFiles=$(find .remote-packages -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
     # To support reproducable builds, CoreMedia uses a dummy date.
     # We replace this by the commit date, which should also remain constant.
-    - BUILD_DATE=$(git log -n 1 --date='format:%Y-%m-%dT%H:%M:%SZ' --format="%ad")
+    - BUILD_DATE=$(git log -n 1 --format="%aI")
     - find -name pom.xml -exec sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
     # release and provider tagging - some tweaks to handle branch and tag name patterns
     # Branch names starting with cmcc- are considered work in progress and packages thus
