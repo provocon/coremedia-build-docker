@@ -53,8 +53,6 @@ jobs:
         for pf in $(grep -l appRoot $(find -name "pom.xml")) ; do
           sed -i "s/appRoot.$/appRoot><creationTime>$BUILD_DATE<\/creationTime>/g" $pf
         done
-        find -name pom.xml -exec \
-          sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
         VERSION_AFTER=$(echo "${{ github.ref_name }}"|sed -e 's/^v\(.*\)-CMCC/\1/g'|sed -e 's/^cmcc.*/1-SNAPSHOT/g')
         VERSION_STRING=`head -15 pom.xml |tail -5 |grep version`
         VERSION_BEFORE=`echo $VERSION_STRING|sed -e 's/.*version.\(.*\)..version.*/\1/g'`
@@ -69,11 +67,13 @@ jobs:
         CM_MAVEN_PASSWORD: ${{ secrets.CM_MAVEN_PASSWORD }}
       run: |
         export CI_PROJECT_DIR=~
+        BUILD_DATE=$(git log -n 1 --format="%aI")
         mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
         -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false \
+        -Dproject.build.outputTimestamp=$BUILD_DATE
         docker images
 
   studio:

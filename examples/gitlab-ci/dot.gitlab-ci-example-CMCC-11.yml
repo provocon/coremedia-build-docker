@@ -109,7 +109,8 @@ Build:
       -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
       -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
       -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-      -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false
+      -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false \
+      -Dproject.build.outputTimestamp=$BUILD_DATE
     #
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find .pnpm-store -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
@@ -132,14 +133,12 @@ Push:
     # Cache check - must not be empty
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - remoteFiles=$(find apps/studio-client/node_modules -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
-    # To support reproducable builds, CoreMedia uses a dummy date.
-    # We replace this by the commit date, which should also remain constant.
+    # Add passing the build daten from code state for reproducible builds.
     - BUILD_DATE=$(git log -n 1 --format="%aI")
     - |
       for pf in $(grep -l appRoot $(find -name "pom.xml")) ; do
         sed -i "s/appRoot.$/appRoot><creationTime>$BUILD_DATE<\/creationTime>/g" $pf
       done
-    - find -name pom.xml -exec sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
     # release and provider tagging - some tweaks to handle branch and tag name patterns
     # Branch names starting with cmcc- are considered work in progress and packages thus
     # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
@@ -192,7 +191,8 @@ Push:
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
         -DskipContent=true -DskipThemes=true -Dskip-joo-unit-tests=true \
         -Dtest='!com.coremedia.**,!com.coremedia.blueprint.connectors.canto.rest.services.*' \
-        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false -f $PART
+        -DfailIfNoTests=false -Dsurefire.failIfNoSpecifiedTests=false \
+        -Dproject.build.outputTimestamp=$BUILD_DATE -f $PART
 
         coremImages=$(docker images --filter=reference='coremedia/*:latest' --format "{{.Repository}}"|grep -v packages-proxy)
         for coremImage in $coremImages ; do
