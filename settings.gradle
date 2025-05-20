@@ -3,4 +3,4 @@
  * Dummy gradle settings file to be able to edit project name of the wiki to show up in my IDE NetBeans.
  *
  */
-rootProject.name = 'CoreMedia Build Container'
+rootProject.name = 'CoreMedia Build Image'
