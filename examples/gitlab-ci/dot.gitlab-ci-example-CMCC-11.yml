@@ -49,7 +49,7 @@ variables:
   # DOCKER_TLS_CERTDIR: ""
   # DOCKER_HOST: tcp://docker:2375
 
-# Generate and store srtifacts for later packaging
+# Generate and store artifacts for later packaging
 Build:
   stage: create
   # Cache downloaded dependencies and plugins between builds.
