@@ -177,42 +177,42 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           26.0.2
- API version:       1.45
- Go version:        go1.21.9
- Git commit:        3c863ff
- Built:             Thu Apr 18 16:26:34 2024
+ Version:           28.1.1
+ API version:       1.49
+ Go version:        go1.23.8
+ Git commit:        4eba377
+ Built:             Fri Apr 18 09:51:06 2025
  OS/Arch:           linux/amd64
  Context:           default
 ```
 
 ```
 $ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
-github.com/docker/buildx v0.14.0 171fcbeb69d67c90ba7f44f41a9e418f6a6ec1da
+github.com/docker/buildx v0.24.0 d0e5e86c8b88ae4865040bc96917c338f4dd673c
 ```
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.9.8 (36645f6c9b5079805ea5009217e36f2cffd34256)
+Apache Maven 3.9.10 (5f519b97e944483d878815739f519b2eade0a91d)
 Maven home: /usr/local/maven
-Java version: 17.0.11, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.50.19-ca-jdk17.0.11-linux_musl_x64
+Java version: 17.0.15, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.58.21-ca-jdk17.0.15-linux_musl_x64
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "6.1.0-18-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "6.1.0-34-amd64", arch: "amd64", family: "unix"
 ```
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v20.12.1
+v22.15.1
 ```
 
 ```
 $ docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
-9.4.0
+10.11.1
 ```
 
 ```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
-version.BuildInfo{Version:"v3.15.2", GitCommit:"1a500d5625419a524fdae4b33de351cc4f58ec35", GitTreeState:"clean", GoVersion:"go1.22.4"}
+version.BuildInfo{Version:"v3.18.2", GitCommit:"04cad4610054e5d546aa5c5d9c1b1d5cf68ec1f8", GitTreeState:"clean", GoVersion:"go1.24.3"}
 ```
 
 To call the container image use
