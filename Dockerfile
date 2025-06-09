@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# https://github.com/docker-library/docker/blob/master/20.10/Dockerfile
+# https://github.com/docker-library/docker/blob/30d7b9bf7663c96fcd888bd75e9aaa547a808a23/20.10/Dockerfile
 FROM docker:28.1
 
 ARG MAVEN_VERSION=3.9.9
