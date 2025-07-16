@@ -19,7 +19,8 @@ FROM docker:28.1
 ARG MAVEN_VERSION=3.9.10
 ARG MAVEN_SHA=4ef617e421695192a3e9a53b3530d803baf31f4269b26f9ab6863452d833da5530a4d04ed08c36490ad0f141b55304bceed58dbf44821153d94ae9abf34d0e1b
 ARG USER_HOME_DIR="/root"
-ARG MAVEN_BASE_URL=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
+ARG MAVEN_BASE=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven
+ARG HELM_BASE=https://get.helm.sh/helm
 ARG HELM_VERSION=3.18.4
 ARG HELM_SHAS="amd64:f8180838c23d7c7d797b208861fecb591d9ce1690d8704ed1e4cb8e2add966c1\narm64:c0a45e67eef0c7416a8a8c9e9d5d2d30d70e4f4d3f7bea5de28241fffa8f3b89\nriscv64:f67f39104c7e695cbba04dc3b4507a80a034ce9e5ccbe55c84e91b1553b787bd"
 ARG PNPM_VERSION=10.11
@@ -41,15 +42,17 @@ ENV DOCKER_TLS_CERTDIR=/certs \
 WORKDIR /usr/local
 
 # The tools cosign, xz, zip, openssh etc are helpers for common CI usages
-RUN apk update && \
-    apk upgrade && \
-    apk add -q curl ca-certificates xz zip parallel sudo git bash openssh-client font-noto gnupg nodejs npm libxext libxrender libxtst libxi cosign && \
+RUN apk update -q && \
+    apk upgrade -q && \
+    apk add -q curl ca-certificates xz zip font-noto gnupg bash nodejs npm git \
+               libxtst libxi openssh-client libxext libxrender cosign parallel \
+               sudo && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
     PATH=/usr/bin:$PATH && \
     npm install -g pnpm@$PNPM_VERSION && \
     mkdir -p $MAVEN_HOME $MAVEN_HOME/ref  && \
-    curl -Lo maven.tgz $MAVEN_BASE_URL/apache-maven-$MAVEN_VERSION-bin.tar.gz 2> /dev/null && \
+    curl -Lo maven.tgz $MAVEN_BASE-$MAVEN_VERSION-bin.tar.gz 2> /dev/null && \
     echo "$MAVEN_SHA  maven.tgz" | sha512sum -c - && \
     tar xzf maven.tgz -C $MAVEN_HOME --strip-components=1 && \
     ln -s $MAVEN_HOME/bin/mvn /usr/local/bin/mvn && \
@@ -57,7 +60,7 @@ RUN apk update && \
     MACHINE=$(uname -m|sed -e 's/86_//g') && \
     echo "Detecting architecture $ARCH / $MACHINE" && \
     HELM_SHA=$(echo -e $HELM_SHAS|grep $ARCH|cut -d ':' -f 2) && \
-    curl -Lo helm.tgz "https://get.helm.sh/helm-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
+    curl -Lo helm.tgz "$HELM_BASE-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
     echo "$HELM_SHA  helm.tgz" | sha256sum -c - && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
