@@ -25,7 +25,6 @@ ARG HELM_VERSION=3.18.4
 ARG HELM_SHAS="amd64:f8180838c23d7c7d797b208861fecb591d9ce1690d8704ed1e4cb8e2add966c1\narm64:c0a45e67eef0c7416a8a8c9e9d5d2d30d70e4f4d3f7bea5de28241fffa8f3b89\nriscv64:f67f39104c7e695cbba04dc3b4507a80a034ce9e5ccbe55c84e91b1553b787bd"
 ARG PNPM_VERSION=10.11
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
-ARG JDK_VERSIONS="amd64:17.0.15:17.58.21\narm64:17.0.15:17.58.21"
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
@@ -34,7 +33,7 @@ LABEL PNPM="$PNPM_VERSION"
 
 ENV DOCKER_TLS_CERTDIR=/certs \
     MAVEN_HOME=/usr/local/maven MAVEN_CONFIG="$USER_HOME_DIR/.m2" \
-    JAVA_HOME=/usr/local/java PNPM_HOME=/usr/local/bin \
+    JAVA_HOME=/usr/lib/jvm/default-jvm PNPM_HOME=/usr/local/bin \
     PATH="$PATH:$JAVA_HOME/bin" \
     LANG='de_DE.UTF-8' LANGUAGE='de_DE:en' LC_ALL='de_DE.UTF-8' \
     DISPLAY=":20.0" SCREEN_GEOMETRY="1440x900x24"
@@ -46,7 +45,7 @@ RUN apk update -q && \
     apk upgrade -q && \
     apk add -q curl ca-certificates xz zip font-noto gnupg bash nodejs npm git \
                libxtst libxi openssh-client libxext libxrender cosign parallel \
-               sudo && \
+               sudo openjdk17-jdk && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
     PATH=/usr/bin:$PATH && \
@@ -64,13 +63,6 @@ RUN apk update -q && \
     echo "$HELM_SHA  helm.tgz" | sha256sum -c - && \
     tar xzf helm.tgz && \
     mv linux-$ARCH/helm bin && \
-    JDK_VERSION=$(echo -e $JDK_VERSIONS|grep $ARCH|cut -d ':' -f 2) && \
-    AZUL_VERSION=$(echo -e $JDK_VERSIONS|grep $ARCH|cut -d ':' -f 3) && \
-    echo "Installing Java $JDK_VERSION / $AZUL_VERSION" && \
-    URL="https://cdn.azul.com/zulu/bin/zulu$AZUL_VERSION-ca-jdk$JDK_VERSION-linux_musl_$MACHINE.tar.gz" && \
-    curl -Lo java.tgz $URL 2> /dev/null && \
-    tar xzf java.tgz && \
-    ln -s zulu* java && \
-    rm -rf linux-* *.tgz *.zip *.sh java/lib/src.zip java/legal java/[mNr]* /root/.[cjn]* /var/cache/apk/*
+    rm -rf linux-* *.tgz *.zip *.sh /root/.[cjn]* /var/cache/apk/*
 
 CMD ["bash"]
