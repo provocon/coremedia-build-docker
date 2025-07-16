@@ -57,7 +57,7 @@ CMCC-10-2004 and so on.
 * `2307` is the current release to work with CMCC-11.
 * `2406` is the current release to work with CMCC-12.
 
-The latest Tag works with - at least again - CMCC-12-2412.0.
+The latest Tag works with - at least again - CMCC-12-2506.0.
 
 Unpublished, daily builds are available from the [Codeberg][codeberg],
 [GitHub][github] and [GitLab][gitlab] project registries.
@@ -143,13 +143,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2406.0 .
+docker build -t provocon/coremedia-build:2406.1 .
 docker build -t provocon/coremedia-build:2406 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2406.0
+docker push provocon/coremedia-build:2406.1
 docker push provocon/coremedia-build:2406
 docker push provocon/coremedia-build:latest
 ```
@@ -162,7 +162,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2406.0 dockerPush
+./gradlew -Ptag=2406.1 dockerPush
 ./gradlew -Ptag=2406   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
@@ -181,8 +181,8 @@ Client:
  API version:       1.49
  Go version:        go1.23.8
  Git commit:        4eba377
- Built:             Fri Apr 18 09:51:06 2025
- OS/Arch:           linux/amd64
+ Built:             Fri Apr 18 09:50:50 2025
+ OS/Arch:           linux/arm64
  Context:           default
 ```
 
@@ -195,9 +195,9 @@ github.com/docker/buildx v0.24.0 d0e5e86c8b88ae4865040bc96917c338f4dd673c
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.9.10 (5f519b97e944483d878815739f519b2eade0a91d)
 Maven home: /usr/local/maven
-Java version: 17.0.15, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.58.21-ca-jdk17.0.15-linux_musl_x64
+Java version: 17.0.15, vendor: Azul Systems, Inc., runtime: /usr/local/zulu17.58.21-ca-jdk17.0.15-linux_musl_aarch64
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "6.1.0-34-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.4.17-2136.311.6.1.el8uek.aarch64", arch: "aarch64", family: "unix"
 ```
 
 ```
@@ -212,7 +212,7 @@ $ docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
 
 ```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
-version.BuildInfo{Version:"v3.18.2", GitCommit:"04cad4610054e5d546aa5c5d9c1b1d5cf68ec1f8", GitTreeState:"clean", GoVersion:"go1.24.3"}
+version.BuildInfo{Version:"v3.18.3", GitCommit:"6838ebcf265a3842d1433956e8a622e3290cf324", GitTreeState:"clean", GoVersion:"go1.24.4"}
 ```
 
 To call the container image use
