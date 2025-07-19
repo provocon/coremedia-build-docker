@@ -16,8 +16,8 @@
 # https://github.com/docker-library/docker/blob/30d7b9bf7663c96fcd888bd75e9aaa547a808a23/20.10/Dockerfile
 FROM docker:28.1
 
-ARG MAVEN_VERSION=3.9.10
-ARG MAVEN_SHA=4ef617e421695192a3e9a53b3530d803baf31f4269b26f9ab6863452d833da5530a4d04ed08c36490ad0f141b55304bceed58dbf44821153d94ae9abf34d0e1b
+ARG MAVEN_VERSION=3.9.11
+ARG MAVEN_SHA=03e2d65d4483a3396980629f260e25cac0d8b6f7f2791e4dc20bc83f9514db8d0f05b0479e699a5f34679250c49c8e52e961262ded468a20de0be254d8207076
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven
 ARG HELM_BASE=https://get.helm.sh/helm
