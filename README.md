@@ -143,13 +143,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2406.1 .
+docker build -t provocon/coremedia-build:2406.2 .
 docker build -t provocon/coremedia-build:2406 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2406.1
+docker push provocon/coremedia-build:2406.2
 docker push provocon/coremedia-build:2406
 docker push provocon/coremedia-build:latest
 ```
@@ -162,7 +162,7 @@ You could as well use [podman][podman] instead of docker in each of the lines.
 Alternatively, you could use the [Gradle Build Tool][gradle] and issue
 
 ```
-./gradlew -Ptag=2406.1 dockerPush
+./gradlew -Ptag=2406.2 dockerPush
 ./gradlew -Ptag=2406   dockerPush
 ./gradlew -Ptag=latest dockerPush
 ```
@@ -177,18 +177,18 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           28.1.1
- API version:       1.49
- Go version:        go1.23.8
- Git commit:        4eba377
- Built:             Fri Apr 18 09:50:50 2025
+ Version:           29.1.3
+ API version:       1.52
+ Go version:        go1.25.5
+ Git commit:        f52814d
+ Built:             Fri Dec 12 14:49:43 2025
  OS/Arch:           linux/arm64
  Context:           default
 ```
 
 ```
 $ docker run --name buildx --rm -it --entrypoint=docker provocon/coremedia-build buildx version
-github.com/docker/buildx v0.24.0 d0e5e86c8b88ae4865040bc96917c338f4dd673c
+github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
 ```
 
 ```
@@ -197,7 +197,7 @@ Apache Maven 3.9.12 (848fbb4bf2d427b72bdb2471c22fced7ebd9a7a1)
 Maven home: /usr/local/maven
 Java version: 17.0.17, vendor: Alpine, runtime: /usr/lib/jvm/java-17-openjdk
 Default locale: de_DE, platform encoding: UTF-8
-OS name: "linux", version: "6.1.0-37-amd64", arch: "amd64", family: "unix"
+OS name: "linux", version: "5.4.17-2136.311.6.1.el8uek.aarch64", arch: "aarch64", family: "unix"
 ```
 
 ```
