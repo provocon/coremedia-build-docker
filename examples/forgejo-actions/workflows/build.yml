@@ -34,9 +34,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Cache local repositories
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/repository
         key: cmcc12
@@ -67,6 +67,7 @@ jobs:
         CM_MAVEN_PASSWORD: ${{ secrets.CM_MAVEN_PASSWORD }}
       run: |
         export CI_PROJECT_DIR=~
+        test ! -z "$(docker images -f "dangling=true" -q)" && docker rmi $(docker images -f "dangling=true" -q)
         BUILD_DATE=$(git log -n 1 --format="%aI")
         mvn install -Pdefault-image -Dmaven.compiler.forceJavacCompilerUse=true \
         -B --no-transfer-progress -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
@@ -82,9 +83,9 @@ jobs:
       image: provocon/coremedia-build:latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Cache local repositories
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: .pnpm-store
         key: cmcc12-studio-client
@@ -103,3 +104,30 @@ jobs:
         DOCKER_BUILDKIT=1 docker build . -t 'coremedia/studio-client:latest'
         rm -rf node_modules
         docker images
+
+  frontend:
+    runs-on: provocon
+    container:
+      image: provocon/coremedia-build:latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+    - name: Cache local repositories
+      uses: actions/cache@v5
+      with:
+        path: .pnpm-store
+        key: cmcc12-frontend
+        restore-keys: cmcc12-frontend
+    - name: Build Frontend Themes
+      working-directory: frontend
+      run: |
+        echo "@coremedia:registry=https://npm.coremedia.io" > ~/.npmrc
+        echo "@jangaroo:registry=https://npm.coremedia.io" >> ~/.npmrc
+        echo "//npm.coremedia.io/:_authToken=${{ secrets.NPMRC_TOKEN }}" >> ~/.npmrc
+        echo "unsafe-perm=true" >> ~/.npmrc
+        pnpm install --no-frozen-lockfile
+        pnpm -r build
+        rm -rf node_modules
+        pnpm -v
+        node -v
+        ls -l target/themes/*

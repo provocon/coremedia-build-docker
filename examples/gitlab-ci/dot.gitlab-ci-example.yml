@@ -44,10 +44,10 @@ variables:
   DOCKER_DRIVER: overlay2
   # https://gitlab.com/gitlab-org/gitlab-runner/issues/4501
   # thanks to volume mount from config.toml
-  DOCKER_TLS_CERTDIR: "/certs"
+  # DOCKER_TLS_CERTDIR: "/certs"
   # Seems necessary with kubernetes executor
-  # DOCKER_TLS_CERTDIR: ""
-  # DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
 
 # Generate and store artifacts for later packaging
 Build:
@@ -62,7 +62,7 @@ Build:
       - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
-    - docker:20.10-dind
+    - docker:29.1-dind
   script:
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
@@ -71,12 +71,14 @@ Build:
     - repoJars=$(find $CI_PROJECT_DIR/repository -type f -name "*.jar" | wc -l) && echo "[cache-check] $repoJars JARs in Maven Repository"
     - mkdir -p .pnpm-store
     - remoteFiles=$(find .pnpm-store -type f | wc -l) && echo "[cache-check] $remoteFiles file in JavaScript Cache"
-    # Add passing the build daten from code state for reproducible builds.
+    # To support reproducable builds, CoreMedia uses a dummy date.
+    # We replace this by the commit date, which should also remain constant.
     - BUILD_DATE=$(git log -n 1 --format="%aI")
     - |
       for pf in $(grep -l appRoot $(find -name "pom.xml")) ; do
         sed -i "s/appRoot.$/appRoot><creationTime>$BUILD_DATE<\/creationTime>/g" $pf
       done
+    - find -name pom.xml -exec sed -i "s/project.build.outputTimestamp.202[0-9].[0-1][0-9].[0-3][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z..project.build.outputTimestamp/project.build.outputTimestamp\\>$BUILD_DATE\\<\\/project.build.outputTimestamp/" {} \;
     # release and provider tagging - some tweaks to handle branch and tag name patterns
     # Branch names starting with cmcc- are considered work in progress and packages thus
     # named 1-SNAPSHOT. Versions in the pom.xml don't need to be 1-SNAPSHOT before all
@@ -120,7 +122,7 @@ Push:
       - apps/studio-client/node_modules
   # https://docs.gitlab.com/runner/executors/docker.html#use-docker-in-docker-with-privileged-mode
   services:
-    - docker:20.10-dind
+    - docker:29.1-dind
   script:
     # Use maven settings from workspace
     - mkdir -p ~/.m2 && cp $CI_PROJECT_DIR/workspace-configuration/maven-settings.xml ~/.m2/settings.xml
