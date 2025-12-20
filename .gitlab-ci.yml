@@ -18,7 +18,7 @@
 # External Container Repository:
 #   DH_REGISTRY_USER
 #   DH_REGISTRY_PASSWORD
-image: docker:28.1
+image: docker:29.1
 
 services:
   - docker:dind

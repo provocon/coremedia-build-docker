@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 # https://github.com/docker-library/docker/blob/30d7b9bf7663c96fcd888bd75e9aaa547a808a23/20.10/Dockerfile
-FROM docker:28.1
+FROM docker:29.1
 
 ARG MAVEN_VERSION=3.9.12
 ARG MAVEN_SHA=0a1be79f02466533fc1a80abbef8796e4f737c46c6574ede5658b110899942a94db634477dfd3745501c80aef9aac0d4f841d38574373f7e2d24cce89d694f70
