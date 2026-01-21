@@ -13,13 +13,13 @@ any customizations. Thus they should form a good starting point for real world
 projects.
 
 The home for the sources to create the image lives at [Codeberg][codeberg] with
-mirrors at [GitHub][github] and [GitLab][gitlab].
+a mirror at [GitLab][gitlab] and some pointers at [GitHub][github].
 
 
 ## Feedback
 
-Please use the [issues][issues] section of this repository at [GitHub][github]
-for feedback.
+Please use the [issues][issues] section of this repository at
+[Codeberg][codeberg] for feedback.
 
 
 ## Goals
@@ -59,8 +59,8 @@ CMCC-10-2004 and so on.
 
 The latest Tag works with - at least again - CMCC-12-2506.0.
 
-Unpublished, daily builds are available from the [Codeberg][codeberg],
-[GitHub][github] and [GitLab][gitlab] project registries.
+Unpublished, daily builds are available from the [Codeberg][codeberg] and
+[GitLab][gitlab] project registries. [GitHub][github] might receive updates.
 
 
 ## Usage
@@ -92,13 +92,13 @@ So, with [Forgejo Actions][forgejo], [GitLab CI][gitlabci], or
 
 * `.forgejo/workflows/build.yml`
 
-[GitHub Actions][actions]:
-
-* `.github/workflows/build.yml`
-
 [GitLab CI][gitlabci]:
 
 * `.gitlab-ci.yml`
+
+[GitHub Actions][actions]:
+
+* `.github/workflows/build.yml`
 
 
 ### Adding secrets
@@ -230,7 +230,7 @@ docker run -it --rm provocon/coremedia-build /bin/bash
 [forgejo]: https://forgejo.org/docs/latest/user/actions/
 [podman]: https://podman.io/
 [dockerhub]: https://hub.docker.com/
-[issues]: https://github.com/provocon/coremedia-build-docker/issues
-[github]: https://github.com/provocon/coremedia-build-docker
+[issues]: https://codeberg.org/provocon/coremedia-build-image/issues
 [codeberg]: https://codeberg.org/provocon/coremedia-build-image
 [gitlab]: https://gitlab.com/provocon/coremedia-build-docker
+[github]: https://github.com/provocon/coremedia-build-docker
