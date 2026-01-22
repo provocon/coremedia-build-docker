@@ -1,5 +1,5 @@
 #
-# Copyright 2023-2024 Martin Goellnitz.
+# Copyright 2023-2026 Martin Goellnitz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ jobs:
     steps:
       # Docker and Node.js are not part of the base image
       - name: Prepare Tools
-        run: apt update ; apt install -yq nodejs docker.io curl
+        run: apt update > /dev/null ; apt install -yq nodejs docker.io curl 2> /dev/null > /dev/null
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
