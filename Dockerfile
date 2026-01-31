@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2025 Martin Goellnitz, Markus Schwarz.
+# Copyright 2017-2026 Martin Goellnitz, Markus Schwarz.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ ARG MAVEN_BASE=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/bina
 ARG HELM_BASE=https://get.helm.sh/helm
 ARG HELM_VERSION=3.19.5
 ARG HELM_SHAS="amd64:a0a5e8c592ed3f376ac110715eff214730c7422f9a44d96cf98117d2b8b0e6c0\narm64:ce02147ffee6d993bf8ae97a44a22e9e1daf0b69d2d5b69a0c8cf6706445ccf5\nriscv64:a33b2df76300d33008a2b47107f289a0de31d461e6bfb2354bf1fd747ccecc9b"
-ARG PNPM_VERSION=10.28.1
+ARG PNPM_VERSION=10.28.2
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
 
 LABEL maintainer="$MAINTAINER"
@@ -45,7 +45,7 @@ RUN apk update -q && \
     apk upgrade -q && \
     apk add -q curl ca-certificates xz zip font-noto gnupg bash nodejs npm git \
                libxtst libxi openssh-client libxext libxrender cosign parallel \
-               sudo openjdk17-jdk && \
+               sudo openjdk21-jdk && \
     echo "export LANG=$LANG" > /etc/profile.d/locale.sh && \
     fc-cache -f && \
     PATH=/usr/bin:$PATH && \
