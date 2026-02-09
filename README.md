@@ -178,11 +178,11 @@ Test the generated resulting container with
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
 Client:
- Version:           29.1.3
+ Version:           29.1.5
  API version:       1.52
- Go version:        go1.25.5
- Git commit:        f52814d
- Built:             Fri Dec 12 14:49:43 2025
+ Go version:        go1.25.6
+ Git commit:        0e6fee6
+ Built:             Fri Jan 16 12:47:30 2026
  OS/Arch:           linux/arm64
  Context:           default
 ```
@@ -196,24 +196,24 @@ github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
 Apache Maven 3.9.12 (848fbb4bf2d427b72bdb2471c22fced7ebd9a7a1)
 Maven home: /usr/local/maven
-Java version: 17.0.17, vendor: Alpine, runtime: /usr/lib/jvm/java-17-openjdk
+Java version: 21.0.10, vendor: Alpine, runtime: /usr/lib/jvm/java-21-openjdk
 Default locale: de_DE, platform encoding: UTF-8
 OS name: "linux", version: "5.4.17-2136.311.6.1.el8uek.aarch64", arch: "aarch64", family: "unix"
 ```
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v24.11.1
+v24.13.0
 ```
 
 ```
 $ docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
-10.26.1
+10.28.2
 ```
 
 ```
 $ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
-version.BuildInfo{Version:"v3.19.4", GitCommit:"7cfb6e486dac026202556836bb910c37d847793e", GitTreeState:"clean", GoVersion:"go1.24.11"}
+version.BuildInfo{Version:"v3.19.5", GitCommit:"4a19a5b6fb912c5c28a779e73f2e0880d9e239a4", GitTreeState:"clean", GoVersion:"go1.24.11"
 ```
 
 To call the container image use
