@@ -173,7 +173,7 @@ which does all the steps above for you.
 
 ## Test
 
-Test the generated resulting container with
+Test the resulting generated image with
 
 ```
 $ docker run --name docker --rm -it --entrypoint=docker provocon/coremedia-build version
