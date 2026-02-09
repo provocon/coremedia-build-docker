@@ -71,7 +71,7 @@ See the `examples/` directory with usage examples and don't forget the
 
 Examples for builds with [Forgejo Actions][forgejo], [GitLab CI][gitlabci] and
 [GitHub Actions][actions] will need the additional files in
-`examples/workspace-configuration` and a personal Token für pnpm login needs to
+`examples/workspace-configuration` and a personal Token for pnpm login needs to
 be created, e.g. through `npm-registry-login.sh`.
 
 Perhaps you still need to mind some parameters when building CoreMedia Content
