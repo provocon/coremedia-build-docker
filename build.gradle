@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2025 Markus Schwarz, Martin Goellnitz for Provocon.
+ * Copyright 2020-2026 Markus Schwarz, Martin Goellnitz for Provocon.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-plugins {
-  id 'com.palantir.docker' version '0.36.0' // https://github.com/palantir/gradle-docker
-}
-
 apply plugin: 'java-base'
 
-defaultTasks 'docker'
-
-def buildTag = project.hasProperty('tag') ? "$tag" : 'latest'
+defaultTasks 'clean'
 
 /* Dummy configuration to be able to edit the wiki contents easily from within my IDE. */
 sourceSets {
@@ -31,9 +25,4 @@ sourceSets {
       exclude '*.gradle'
     }
   }
-}
-
-/* Build and push the final image to https://hub.docker.com/r/provocon/coremedia-build/tags with "gradle dockerPush" */
-docker {
-  name "provocon/coremedia-build:$buildTag"
 }
