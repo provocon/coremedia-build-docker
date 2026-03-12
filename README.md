@@ -158,19 +158,6 @@ docker push provocon/coremedia-build:latest
 You could as well use [podman][podman] instead of docker in each of the lines.
 
 
-### Scripted Build
-
-Alternatively, you could use the [Gradle Build Tool][gradle] and issue
-
-```
-./gradlew -Ptag=2512.0 dockerPush
-./gradlew -Ptag=2512   dockerPush
-./gradlew -Ptag=latest dockerPush
-```
-
-which does all the steps above for you.
-
-
 ## Test
 
 Test the resulting generated image with
@@ -224,7 +211,6 @@ docker run -it --rm provocon/coremedia-build /bin/bash
 
 [coremedia]: http://www.coremedia.com/
 [maven]: https://maven.apache.org/
-[gradle]: https://gradle.org/
 [npm]: https://www.npmjs.com/
 [gitlabci]: https://docs.gitlab.com/ee/ci/
 [actions]: https://github.com/features/actions
