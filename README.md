@@ -18,7 +18,7 @@ a mirror at [GitLab][gitlab] and some pointers at [GitHub][github].
 
 ## Feedback
 
-Please use the [issues][issues] section of this repository at
+Feel invited to use the [issues][issues] section of this repository at
 [Codeberg][codeberg] for feedback.
 
 
