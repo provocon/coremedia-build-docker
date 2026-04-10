@@ -181,7 +181,7 @@ github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.9.12 (848fbb4bf2d427b72bdb2471c22fced7ebd9a7a1)
+Apache Maven 3.9.14 (996c630dbc656c76214ce58821dcc58be960875b)
 Maven home: /usr/local/maven
 Java version: 21.0.10, vendor: Alpine, runtime: /usr/lib/jvm/java-21-openjdk
 Default locale: de_DE, platform encoding: UTF-8
