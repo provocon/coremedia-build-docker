@@ -20,15 +20,11 @@ ARG MAVEN_VERSION=3.9.15
 ARG MAVEN_SHA=33d81e0ec785f0207e3e5e3ffb61863e1dca5784c15ac3fb5ff105f69cffbea484eb8d473ea60467a63f7b0570eef8622f2fed8eee96acbe668aa313391cddb3
 ARG USER_HOME_DIR="/root"
 ARG MAVEN_BASE=https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven
-ARG HELM_BASE=https://get.helm.sh/helm
-ARG HELM_VERSION=3.20.1
-ARG HELM_SHAS="amd64:0165ee4a2db012cc657381001e593e981f42aa5707acdd50658326790c9d0dc3\narm64:56b9d1b0e0efbb739be6e68a37860ace8ec9c7d3e6424e3b55d4c459bc3a0401\nriscv64:0eeae246112b4780e61651f9fbe6d778eebf8c8eccca590139b97d167d1b8aeb"
 ARG PNPM_VERSION=10.33.0
 ARG MAINTAINER='PROVOCON https://codeberg.org/provocon'
 
 LABEL maintainer="$MAINTAINER"
 LABEL Maven="$MAVEN_VERSION"
-LABEL Helm="$HELM_VERSION"
 LABEL PNPM="$PNPM_VERSION"
 
 ENV DOCKER_TLS_CERTDIR=/certs \
@@ -58,11 +54,6 @@ RUN apk update -q && \
     ARCH=$(uname -m|sed -e 's/x86_64/amd64/g'|sed -e 's/aarch64/arm64/g') && \
     MACHINE=$(uname -m|sed -e 's/86_//g') && \
     echo "Detecting architecture $ARCH / $MACHINE" && \
-    HELM_SHA=$(echo -e $HELM_SHAS|grep $ARCH|cut -d ':' -f 2) && \
-    curl -Lo helm.tgz "$HELM_BASE-v$HELM_VERSION-linux-$ARCH.tar.gz" 2> /dev/null && \
-    echo "$HELM_SHA  helm.tgz" | sha256sum -c - && \
-    tar xzf helm.tgz && \
-    mv linux-$ARCH/helm bin && \
     rm -rf linux-* *.tgz *.zip *.sh /root/.[cjn]* /var/cache/apk/*
 
 CMD ["bash"]

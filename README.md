@@ -181,7 +181,7 @@ github.com/docker/buildx v0.30.1 9e66234aa13328a5e75b75aa5574e1ca6d6d9c01
 
 ```
 $ docker run --name mvn --rm -it --entrypoint=mvn provocon/coremedia-build -v
-Apache Maven 3.9.14 (996c630dbc656c76214ce58821dcc58be960875b)
+Apache Maven 3.9.15 (98b2cdbfdb5f1ac8781f537ea9acccaed7922349)
 Maven home: /usr/local/maven
 Java version: 21.0.10, vendor: Alpine, runtime: /usr/lib/jvm/java-21-openjdk
 Default locale: de_DE, platform encoding: UTF-8
@@ -190,17 +190,12 @@ OS name: "linux", version: "5.4.17-2136.311.6.1.el8uek.aarch64", arch: "aarch64"
 
 ```
 $ docker run --name node --rm -it --entrypoint=node provocon/coremedia-build -v
-v24.13.0
+v24.14.1
 ```
 
 ```
 $ docker run --name pnpm --rm -it --entrypoint=pnpm provocon/coremedia-build -v
-10.28.2
-```
-
-```
-$ docker run --name helm --rm -it --entrypoint=helm provocon/coremedia-build version
-version.BuildInfo{Version:"v3.19.5", GitCommit:"4a19a5b6fb912c5c28a779e73f2e0880d9e239a4", GitTreeState:"clean", GoVersion:"go1.24.11"
+10.33.0
 ```
 
 To call the container image use
