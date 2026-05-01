@@ -144,13 +144,13 @@ docker build -t <myname> .
 So, for the current version, this is
 
 ```
-docker build -t provocon/coremedia-build:2512.0 .
+docker build -t provocon/coremedia-build:2512.1 .
 docker build -t provocon/coremedia-build:2512 .
 docker build -t provocon/coremedia-build:latest .
 ```
 
 ```
-docker push provocon/coremedia-build:2512.0
+docker push provocon/coremedia-build:2512.1
 docker push provocon/coremedia-build:2512
 docker push provocon/coremedia-build:latest
 ```
