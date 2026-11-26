@@ -23,7 +23,7 @@ env:
 jobs:
   build:
 
-    runs-on: provocon
+    runs-on: codeberg-small
     container:
       image: provocon/coremedia-build:latest
     permissions:
