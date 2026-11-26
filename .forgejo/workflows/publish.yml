@@ -42,7 +42,7 @@ jobs:
         run: apt update > /dev/null ; apt install -yq nodejs docker.io curl 2> /dev/null > /dev/null
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
